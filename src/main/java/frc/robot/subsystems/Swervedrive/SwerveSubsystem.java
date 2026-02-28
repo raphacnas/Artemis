@@ -25,7 +25,6 @@ import java.util.function.Supplier;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
-import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
@@ -52,8 +51,7 @@ public class SwerveSubsystem extends SubsystemBase{
     {
       throw new RuntimeException(e);
     }
-    swerveDrive.setHeadingCorrection(true); 
-    swerveDrive.setCosineCompensator(false);
+    swerveDrive.setCosineCompensator(true);
     swerveDrive.setAngularVelocityCompensation(false,false, 0);
     swerveDrive.setModuleEncoderAutoSynchronize(false,1); 
   }
@@ -183,9 +181,8 @@ public class SwerveSubsystem extends SubsystemBase{
   }
 
   public ChassisSpeeds getTargetSpeeds(double xInput, double yInput, double headingX, double headingY){
-    Translation2d scaledInputs = SwerveMath.cubeTranslation(new Translation2d(xInput, yInput));
-    return swerveDrive.swerveController.getTargetSpeeds(scaledInputs.getX(),
-                                                        scaledInputs.getY(),
+    return swerveDrive.swerveController.getTargetSpeeds(xInput,
+                                                        yInput,
                                                         headingX,
                                                         headingY,
                                                         getHeading().getRadians(),
@@ -193,10 +190,8 @@ public class SwerveSubsystem extends SubsystemBase{
   }
 
   public ChassisSpeeds getTargetSpeeds(double xInput, double yInput, Rotation2d angle){
-    Translation2d scaledInputs = SwerveMath.cubeTranslation(new Translation2d(xInput, yInput));
-
-    return swerveDrive.swerveController.getTargetSpeeds(scaledInputs.getX(),
-                                                        scaledInputs.getY(),
+    return swerveDrive.swerveController.getTargetSpeeds(xInput,
+                                                        yInput,
                                                         angle.getRadians(),
                                                         getHeading().getRadians(),
                                                         Constants.MAX_SPEED);

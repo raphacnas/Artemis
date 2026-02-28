@@ -51,5 +51,25 @@ public final class Constants {
     public static final double ANGLE_MAX_OUTPUT = 0.0;
 
   }
+
+  public static class PreShooterConstants {
+    public static final int PRE_SHOOTER_ID = 12;
+    public static final double FEED_POWER = 0.5;
   
+  }
+
+  public static class ShooterConstants{
+
+    public static final int SHOOTER_ID = 13;
+
+    public static final double NEO_kP = 0.0002;
+    public static final double NEO_kI = 0.0;
+    public static final double NEO_kD = 0.0;
+    public static final double NEO_kFF = 0.00018;
+
+    public static final double NEO_TARGET_RPM = 3100;
+
+    public static final double RPM_TOLERANCE = 100;
+    
+  }
 }

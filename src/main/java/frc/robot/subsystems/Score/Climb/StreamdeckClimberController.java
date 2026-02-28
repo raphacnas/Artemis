@@ -8,7 +8,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class StreamdeckClimberController extends SubsystemBase {
   /** Creates a new StreamdeckClimberController. */
-  public StreamdeckClimberController() {}
+  public StreamdeckClimberController() {
+
+    //FAZER DEPOIS 
+  }
 
   @Override
   public void periodic() {
