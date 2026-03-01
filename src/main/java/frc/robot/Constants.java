@@ -13,6 +13,7 @@ public final class Constants {
   public static final double MAX_SPEED = Units.feetToMeters(12);
   public static final double K_AUTO_PIECE_FORWARD = -0.1;
   public static final double TA_TARGET = 5;
+public static final double MAX_ANGULAR_SPEED = 0;
 
   public static final class DrivebaseConstants {
     public static final double WHEEL_LOCK_TIME = 10;

@@ -27,6 +27,14 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.function.Supplier;
 
+
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathfindingCommand;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
 import com.revrobotics.spark.SparkMax;
 
 import swervelib.SwerveController;
@@ -61,8 +69,41 @@ public class SwerveSubsystem extends SubsystemBase{
     swerveDrive.setCosineCompensator(true);
     swerveDrive.setAngularVelocityCompensation(false,false, 0);
     swerveDrive.setModuleEncoderAutoSynchronize(false,1); 
+    setupPathPlanner();
   }
 
+  private void setupPathPlanner() {
+
+    try {
+
+        AutoBuilder.configure(
+            this::getPose,
+            this::resetOdometry,
+            this::getRobotVelocity,
+
+            (speeds, feedforwards) -> {
+                swerveDrive.setChassisSpeeds(speeds);
+            },
+
+            new PPHolonomicDriveController(
+                new PIDConstants(5.0, 0.0, 0.0),
+                new PIDConstants(5.0, 0.0, 0.0)
+            ),
+
+            RobotConfig.fromGUISettings(),
+
+            () -> DriverStation.getAlliance().isPresent()
+                    && DriverStation.getAlliance().get() == DriverStation.Alliance.Red,
+
+            this
+        );
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    PathfindingCommand.warmupCommand().schedule();
+}
   // ================= HEADING PID =================
 
 private final ProfiledPIDController headingPID =
@@ -268,4 +309,14 @@ public double getTotalRobotCurrent() {
     return swerveDrive;
   }
   
+  public PathConstraints getPathConstraints() {
+  return new PathConstraints(
+      3.0,
+      2.5,
+      Math.PI,
+      Math.PI * 2
+  );
+}
+
+
 }

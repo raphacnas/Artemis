@@ -10,7 +10,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.TagsID.HubTagSelector;
+import frc.robot.TagsID.OutPostSelector;
 import frc.robot.TagsID.TowerTagSelector;
+import frc.robot.TagsID.OutPostSelector.OutPost;
 
 public class ViewSubsystem extends SubsystemBase {
 
@@ -154,4 +156,50 @@ public class ViewSubsystem extends SubsystemBase {
         - Constants.LimelightConstants.LIMELIGHT_HEIGHT)
         / Math.tan(angle);
   }
+
+  public void selectAllHubTags() {
+
+  var alliance = DriverStation.getAlliance();
+  if (alliance.isEmpty()) return;
+
+  allowedBackTags = Set.of();
+
+  allowedBackTags = new java.util.HashSet<>();
+  allowedBackTags.addAll(HubTagSelector.getTags(
+      HubTagSelector.HubSide.LEFT,
+      alliance.get()));
+  allowedBackTags.addAll(HubTagSelector.getTags(
+      HubTagSelector.HubSide.CENTER,
+      alliance.get()));
+  allowedBackTags.addAll(HubTagSelector.getTags(
+      HubTagSelector.HubSide.RIGHT,
+      alliance.get()));
 }
+
+public void selectAllTowerTags() {
+
+  var alliance = DriverStation.getAlliance();
+  if (alliance.isEmpty()) return;
+
+  allowedFrontTags = new java.util.HashSet<>();
+  allowedFrontTags.addAll(TowerTagSelector.getTags(
+      TowerTagSelector.TowerSide.CENTER,
+      alliance.get()));
+  allowedFrontTags.addAll(TowerTagSelector.getTags(
+      TowerTagSelector.TowerSide.RIGHT,
+      alliance.get()));
+}
+
+public void selectTagOutpost()
+{
+  var alliance = DriverStation.getAlliance();
+  if(alliance.isEmpty()) return;
+
+  allowedBackTags = new java.util.HashSet<>();
+  allowedBackTags.addAll(OutPostSelector.getTags(
+      OutPost.CENTER,
+      alliance.get()));
+}
+
+}
+

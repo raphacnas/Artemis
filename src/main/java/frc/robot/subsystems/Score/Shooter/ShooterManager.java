@@ -97,9 +97,7 @@ public void periodic() {
     }
 
     double ty = vision.getBackTy();  
-
-    // ty = 0 quando estiver na distância ideal
-    // ajuste seu crosshair na limelight para calibrar
+    // ajuste o crosshair na limelight para calibrar
 
     double kPDistance = -0.1;
 
