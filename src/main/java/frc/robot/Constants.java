@@ -7,6 +7,9 @@ import swervelib.math.Matter;
 
 public final class Constants {
 
+  public static final int PS5_ID = 0;
+  public static final int LOGITECH_ID = 1;
+
   public static final double ROBOT_MASS = 56;
   public static final Matter CHASSIS = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
   public static final double LOOP_TIME = 0.13;
@@ -61,7 +64,7 @@ public final class Constants {
 
   public static class SpindexerConstants {
 
-    public static final double SPIN_POWER = -0.9;
+    public static final double SPIN_POWER = -1;
     public static final int SPINNER_ID = 11;
   
   }

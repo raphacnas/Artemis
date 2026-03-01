@@ -4,6 +4,12 @@
 
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.cscore.VideoMode;
+import edu.wpi.first.cscore.VideoSource;
+import edu.wpi.first.util.PixelFormat;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -36,11 +42,18 @@ public void robotInit() {
 //   }
 
 //   Logger.start();  
+
+  UsbCamera cam = CameraServer.startAutomaticCapture(0);
+  // cam.setPixelFormat(PixelFormat.kMJPEG);
+  // cam.setResolution(320, 240);
+  // cam.setFPS(30);
+  // cam.setConnectionStrategy(VideoSource.ConnectionStrategy.kKeepOpen);
 }
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
     Logger.recordOutput("Robot/LoopTimeSec", edu.wpi.first.wpilibj.Timer.getFPGATimestamp() );
     SmartDashboard.putNumber("teste", 123);
+    SmartDashboard.putNumber("REAL_TEST", 999);
     
     //robotContainer.updateDashboards();
    

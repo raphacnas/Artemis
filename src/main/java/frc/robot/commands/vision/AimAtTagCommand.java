@@ -1,6 +1,9 @@
 package frc.robot.commands.vision;
 
+import java.lang.constant.Constable;
+
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.Sensors.ViewSubsystem;
@@ -15,17 +18,22 @@ public class AimAtTagCommand extends Command {
   private final SwerveSubsystem swerve;
   private final ViewSubsystem vision;
   private final CameraSide side;
+  private final double xSupplier, ySupplier;
 
   private boolean enabled = false;
 
   public AimAtTagCommand(
       SwerveSubsystem swerve,
       ViewSubsystem vision,
-      CameraSide side
+      CameraSide side,
+      double xSupplier,
+      double ySupplier
   ) {
     this.swerve = swerve;
     this.vision = vision;
     this.side = side;
+    this.xSupplier = xSupplier;
+    this.ySupplier = ySupplier;
 
     addRequirements(swerve);
   }
@@ -70,7 +78,7 @@ public class AimAtTagCommand extends Command {
 
     rot = Math.max(Math.min(rot, 2.0), -2.0);
 
-    swerve.drive(new Translation2d(), rot, false);
+    swerve.drive(new Translation2d(xSupplier, ySupplier), rot, false);
   }
 
   @Override

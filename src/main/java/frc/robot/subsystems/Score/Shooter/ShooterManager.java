@@ -1,10 +1,10 @@
 package frc.robot.subsystems.Score.Shooter;
 
-import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Sensors.ViewSubsystem;
 
-    public class ShooterManager extends SubsystemBase {
+public class ShooterManager extends SubsystemBase {
 
     public enum ShooterState {
         IDLE,
@@ -20,12 +20,21 @@ import frc.robot.subsystems.Sensors.ViewSubsystem;
 
     private double lastValidDistance = 0.0;
 
-    private final double[] distances = {1.0, 2.0, 2.5, 3.0, 3.5, 4.0};
-    private final double[] rpms      = {3400, 3700, 4000, 4300, 4600, 5000};
+    // Tabela de interpolação da WPILib
+    private final InterpolatingDoubleTreeMap rpmTable = new InterpolatingDoubleTreeMap();
 
     public ShooterManager(ShooterSubsystem shooter, ViewSubsystem vision) {
         this.shooter = shooter;
         this.vision = vision;
+
+        // Configuração da tabela: (Distância, RPM)
+        // O próprio mapa cuida da interpolação linear e dos limites (clamping)
+        rpmTable.put(1.0, 3400.0);
+        rpmTable.put(2.0, 3700.0);
+        rpmTable.put(2.5, 4000.0);
+        rpmTable.put(3.0, 4300.0);
+        rpmTable.put(3.5, 4600.0);
+        rpmTable.put(4.0, 5000.0);
     }
 
     // ================= TELEOP =================
@@ -50,75 +59,44 @@ import frc.robot.subsystems.Sensors.ViewSubsystem;
         state = ShooterState.IDLE;
     }
 
-        public boolean isEnabled() {
-            return state == ShooterState.SPINNING || state == ShooterState.AT_SPEED;
-        }
-
-        public boolean isAtSpeed() {
-            return state == ShooterState.AT_SPEED;
-        }
-
-        public ShooterState getState() {
-            return state;
-        }
-
-    private double interpolateRPM(double distance) {
-
-        if (distance <= distances[0])
-            return rpms[0];
-
-        if (distance >= distances[distances.length - 1])
-            return rpms[rpms.length - 1];
-
-        for (int i = 0; i < distances.length - 1; i++) {
-            if (distance >= distances[i] && distance <= distances[i + 1]) {
-
-                double t = (distance - distances[i]) /
-                           (distances[i + 1] - distances[i]);
-
-                return MathUtil.interpolate(rpms[i], rpms[i + 1], t);
-            }
-        }
-
-        return distance;
+    public boolean isEnabled() {
+        return state == ShooterState.SPINNING || state == ShooterState.AT_SPEED;
     }
 
-       @Override
-public void periodic() {
-
-    if (state == ShooterState.IDLE || state == ShooterState.DISABLED) {
-        shooter.stop();
-        return;
+    public boolean isAtSpeed() {
+        return state == ShooterState.AT_SPEED;
     }
 
-    if (!vision.hasValidBackTarget()) {
-        shooter.stop();
-        return;
+    public ShooterState getState() {
+        return state;
     }
 
-    double ty = vision.getBackTy();  
+    @Override
+    public void periodic() {
+        
+        System.out.println("Distance: " + vision.getBackDistanceToTag());
 
-    // ty = 0 quando estiver na distância ideal
-    // ajuste seu crosshair na limelight para calibrar
+        if (state == ShooterState.IDLE || state == ShooterState.DISABLED) {
+            shooter.stop();
+            return;
+        }
 
-    double kPDistance = -0.1;
+        double distance = vision.getBackDistanceToTag();
 
-    double distanceError = ty;
-    double distanceAdjust = kPDistance * distanceError;
+        if (distance != Double.MAX_VALUE) {
+            lastValidDistance = distance;
+        }
 
-    
-    double baseRPM = 4200;
+        // Obtém o RPM interpolado automaticamente
+        double rpm = rpmTable.get(lastValidDistance);
 
-    double targetRPM = baseRPM + (distanceAdjust * 1000);
+        shooter.setTargetRPM(rpm);
 
-    targetRPM = MathUtil.clamp(targetRPM, 3000, 5000);
-
-    shooter.setTargetRPM(targetRPM);
-
-    if (shooter.isAtSpeed()) {
-        state = ShooterState.AT_SPEED;
-    } else {
-        state = ShooterState.SPINNING;
+        // Atualização de estado baseada no feedback do motor
+        if (shooter.isAtSpeed()) {
+            state = ShooterState.AT_SPEED;
+        } else {
+            state = ShooterState.SPINNING;
+        }
     }
-}
 }

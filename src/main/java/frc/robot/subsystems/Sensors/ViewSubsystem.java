@@ -16,8 +16,8 @@ public class ViewSubsystem extends SubsystemBase {
 
   // ================= TAG FILTER =================
 
-  private Set<Integer> allowedFrontTags = Set.of(); // Torre
-  private Set<Integer> allowedBackTags  = Set.of(); // Hub + Outpost
+  private Set<Integer> allowedFrontTags = Set.of(31, 32, 15, 16); // Torre
+  private Set<Integer> allowedBackTags  = Set.of(25, 26, 18, 27, 21, 24, 9, 10, 11, 2, 8, 5); // Hub 
 
   // ================= LIMELIGHTS =================
 
@@ -81,27 +81,22 @@ public class ViewSubsystem extends SubsystemBase {
         limeFront.getEntry("tx").getDouble(0.0));
   }
 
+  /**
+   * Obtém a distância da câmera frontal usando 3D Pose (PnP)
+   * Ideal para câmeras sem inclinação física.
+   */
   public double getFrontDistanceToTag() {
+    if (!hasValidFrontTarget()) return Double.MAX_VALUE;
 
-    if (!hasValidFrontTarget())
-      return Double.MAX_VALUE;
+    // Obtém o array de pose [x, y, z, roll, pitch, yaw]
+    double[] pose = limeFront.getEntry("targetpose_cameraspace").getDoubleArray(new double[0]);
 
-    double tyDegrees =
-        limeFront.getEntry("ty").getDouble(0.0);
+    if (pose.length >= 6) {
+        // O índice 2 é o eixo Z (distância frontal em metros)
+        return Math.abs(pose[2]);
+    }
 
-    double tyRadians =
-        Units.degreesToRadians(tyDegrees);
-
-    double angle =
-        Constants.LimelightConstants.LIMELIGHT_ANGLE + tyRadians;
-
-    if (Math.abs(Math.tan(angle)) < 1e-3)
-      return Double.MAX_VALUE;
-
-    return
-        (Constants.LimelightConstants.TAG_HEIGHT
-        - Constants.LimelightConstants.LIMELIGHT_HEIGHT)
-        / Math.tan(angle);
+    return Double.MAX_VALUE;
   }
 
   // ===================== BACK (HUB + OUTPOST) =====================
@@ -130,28 +125,17 @@ public class ViewSubsystem extends SubsystemBase {
 
   public double getBackTy() {
     return limeBack.getEntry("ty").getDouble(0.0);
-}
+  }
 
   public double getBackDistanceToTag() {
+    if (!hasValidBackTarget()) return Double.MAX_VALUE;
 
-    // if (!hasValidBackTarget())
-    //   return Double.MAX_VALUE;
+    double[] pose = limeBack.getEntry("targetpose_cameraspace").getDoubleArray(new double[0]);
 
-    double tyDegrees =
-        limeBack.getEntry("ty").getDouble(0.0);
+    if (pose.length >= 6) {
+        return Math.abs(pose[2]); // O índice 2 é o eixo Z (distância direta até a Tag em metros)
+    }
 
-    double tyRadians =
-        Units.degreesToRadians(tyDegrees);
-
-    double angle =
-        Constants.LimelightConstants.LIMELIGHT_ANGLE + tyRadians;
-
-    if (Math.abs(Math.tan(angle)) < 1e-3)
-      return Double.MAX_VALUE;
-
-    return
-        (Constants.LimelightConstants.TAG_HEIGHT
-        - Constants.LimelightConstants.LIMELIGHT_HEIGHT)
-        / Math.tan(angle);
+    return Double.MAX_VALUE;
   }
 }
