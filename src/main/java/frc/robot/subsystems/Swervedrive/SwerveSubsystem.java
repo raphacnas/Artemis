@@ -52,12 +52,8 @@ public class SwerveSubsystem extends SubsystemBase{
 
    public SwerveSubsystem(File directory){ 
     boolean blueAlliance = DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue;
-    Pose2d startingPose = blueAlliance ? new Pose2d(new Translation2d(Meter.of(1),
-                                                                      Meter.of(4)),
-                                                    Rotation2d.fromDegrees(0))
-                                       : new Pose2d(new Translation2d(Meter.of(16),
-                                                                      Meter.of(4)),
-                                                    Rotation2d.fromDegrees(180));
+    Pose2d startingPose = new Pose2d();
+    
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     try{
       swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.MAX_SPEED, startingPose);
@@ -72,6 +68,10 @@ public class SwerveSubsystem extends SubsystemBase{
     setupPathPlanner();
   }
 
+  public ChassisSpeeds getRobotRelativeSpeeds() {
+    return swerveDrive.getRobotVelocity();
+}
+
   private void setupPathPlanner() {
 
     try {
@@ -79,7 +79,7 @@ public class SwerveSubsystem extends SubsystemBase{
         AutoBuilder.configure(
             this::getPose,
             this::resetOdometry,
-            this::getRobotVelocity,
+            this::getRobotRelativeSpeeds,
 
             (speeds, feedforwards) -> {
                 swerveDrive.setChassisSpeeds(speeds);

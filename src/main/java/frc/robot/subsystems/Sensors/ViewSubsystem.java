@@ -141,22 +141,15 @@ public class ViewSubsystem extends SubsystemBase {
     return Double.MAX_VALUE;
   }
 
-  public void selectAllHubTags() {
+ public void selectAllHubTags() {
 
   var alliance = DriverStation.getAlliance();
   if (alliance.isEmpty()) return;
 
-  allowedBackTags = Set.of();
-
   allowedBackTags = new java.util.HashSet<>();
-  allowedBackTags.addAll(HubTagSelector.getTags(
-      HubTagSelector.HubSide.LEFT,
-      alliance.get()));
+
   allowedBackTags.addAll(HubTagSelector.getTags(
       HubTagSelector.HubSide.CENTER,
-      alliance.get()));
-  allowedBackTags.addAll(HubTagSelector.getTags(
-      HubTagSelector.HubSide.RIGHT,
       alliance.get()));
 }
 

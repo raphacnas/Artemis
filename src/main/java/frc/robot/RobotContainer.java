@@ -3,15 +3,23 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj2.command.*;
-import edu.wpi.first.wpilibj2.command.button.*;
-import frc.robot.commands.Poses.AutoGoAndAlignOutpost;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
+import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.auto_blocks.NamedCommandsRegistry;
 import frc.robot.commands.teleopDrive.DriveCommand;
 import frc.robot.commands.vision.AimAtTagCommand;
 import frc.robot.commands.vision.AlignWithPieceCommand;
-import frc.robot.commands.vision.AutoShootAssistCommand;
 import frc.robot.subsystems.Score.Angular.IntakeAngleManager;
 import frc.robot.subsystems.Score.Angular.StreamDeckIntakeAngleController;
+import frc.robot.subsystems.Score.Climb.ClimberManager;
 import frc.robot.subsystems.Score.PreShooter.PreShooterManager;
 import frc.robot.subsystems.Score.PreShooter.PreShooterSubsystem;
 import frc.robot.subsystems.Score.Rollers.IntakeManager;
@@ -27,13 +35,16 @@ import frc.robot.subsystems.Swervedrive.SwerveSubsystem;
 import java.io.File;
 import java.util.function.DoubleSupplier;
 
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 public class RobotContainer {
 
-  /* ================= CONTROLES ================= */
+  /* ================= CONTROLLERS ================= */
   private final CommandPS5Controller controller;
   private final CommandJoystick logitech;
 
   /* ================= INPUT SUPPLIERS ================= */
+  // FIX: Use lambdas so these return the current axis value each call
   private final DoubleSupplier xSupplier;
   private final DoubleSupplier ySupplier;
 
@@ -62,9 +73,9 @@ public class RobotContainer {
     controller = new CommandPS5Controller(Constants.PS5_ID);
     logitech = new CommandJoystick(Constants.LOGITECH_ID);
 
-    /* ========= SUPPLIERS (CORRETO) ========= */
-    xSupplier = () -> -controller.getLeftX();
-    ySupplier = () -> -controller.getLeftY();
+    // FIX: Wrap in lambdas — getLeftX()/getLeftY() return double, not DoubleSupplier
+    xSupplier = () -> controller.getLeftX();
+    ySupplier = () -> controller.getLeftY();
 
     /* ========= SUBSYSTEMS ========= */
     drivebase = new SwerveSubsystem(
@@ -87,8 +98,15 @@ public class RobotContainer {
     rollerStreamDeck = new StreamDeckIntakeRollerController(rollerManager);
 
     configureBindings();
-
     DriverStation.silenceJoystickConnectionWarning(true);
+
+    NamedCommandsRegistry.registerAll(
+        drivebase,
+        vision,
+        shooterManager,
+        preShooterManager,
+        spindexerManager
+    );
 
     vision.selectAllHubTags();
     vision.selectAllTowerTags();
@@ -96,29 +114,34 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-    /* ================= DRIVE ================= */
+    /* ==================== =================== ====================
+     * ==================== PILOTO DE LOCOMOÇÃO ====================
+       =================== ==================== ==================== */
 
+    // Default drive command using fixed DoubleSuppliers
     drivebase.setDefaultCommand(
         new DriveCommand(
             drivebase,
             () -> {
-              if (controller.povUp().getAsBoolean()) return 0.6;
-              if (controller.povDown().getAsBoolean()) return -0.6;
-              return ySupplier.getAsDouble();
+                if (controller.povUp().getAsBoolean()) return 0.6;
+                if (controller.povDown().getAsBoolean()) return -0.6;
+                return ySupplier.getAsDouble(); // FIX: call getAsDouble()
             },
             () -> {
-              if (controller.povRight().getAsBoolean()) return -0.6;
-              if (controller.povLeft().getAsBoolean()) return 0.6;
-              return xSupplier.getAsDouble();
+                if (controller.povRight().getAsBoolean()) return -0.6;
+                if (controller.povLeft().getAsBoolean()) return 0.6;
+                return xSupplier.getAsDouble(); // FIX: call getAsDouble()
             },
             () -> controller.getRightX()
         )
     );
 
+    // Zero gyro relative to alliance
     controller.options().onTrue(
         Commands.runOnce(drivebase::zeroGyroWithAlliance)
     );
 
+    // Aim at tag with back camera (toggle)
     controller.square().toggleOnTrue(
         new AimAtTagCommand(
             drivebase,
@@ -191,7 +214,7 @@ public class RobotContainer {
   /* ================= AUTO ================= */
 
   public Command getAutonomousCommand() {
-    return new AutoGoAndAlignOutpost(drivebase, vision);
+    return new PathPlannerAuto("AutoFix");
   }
 
   /* ================= GETTERS ================= */
