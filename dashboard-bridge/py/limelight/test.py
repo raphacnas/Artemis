@@ -1,10 +1,7 @@
 from ultralytics import YOLO
 
-model = YOLO("best.pt")
-# model.train(imgsz=640, epochs=150)
-model.predict(source=0, show=True, conf=0.40)
-model = YOLO("gamepiece2026.pt")
-model.predict(source="http://10.91.63.2:1181/?action=stream", show=True, conf=0.20)
+model = YOLO("yolov8n.pt")
+model.predict(source="http://10.91.63.2:1181/?action=stream", show=True, conf=0.50)
 
 # from networktables import NetworkTables
 # import time

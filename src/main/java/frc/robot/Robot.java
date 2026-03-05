@@ -4,19 +4,17 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.cscore.VideoMode;
+import edu.wpi.first.cscore.VideoSource;
+import edu.wpi.first.util.PixelFormat;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.Swervedrive.SwerveSubsystem;
-
-import java.io.File;
-
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.NT4Publisher;
-import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
@@ -32,23 +30,22 @@ public class Robot extends LoggedRobot {
    @Override
 public void robotInit() {
 
-  Logger.recordMetadata("ProjectName", "SwerveBinga"); 
-  Logger.recordMetadata("RuntimeType", RobotBase.getRuntimeType().toString());
+//   Logger.recordMetadata("ProjectName", "SwerveBinga"); 
+//   Logger.recordMetadata("RuntimeType", RobotBase.getRuntimeType().toString());
 
-  if (RobotBase.isSimulation()) {
-    Logger.addDataReceiver(new WPILOGWriter("logs"));
-    Logger.addDataReceiver(new NT4Publisher());
-  } else {
-    Logger.addDataReceiver(new WPILOGWriter("/U/logs"));
-    Logger.addDataReceiver(new NT4Publisher());
-  }
+  // if (RobotBase.isSimulation()) {
+  //   Logger.addDataReceiver(new WPILOGWriter("logs"));
+  //   Logger.addDataReceiver(new NT4Publisher());
+  // } else {
+  //   Logger.addDataReceiver(new WPILOGWriter("/U/logs"));
+  //   Logger.addDataReceiver(new NT4Publisher());
+  // }
 
-  Logger.start();  
+  // Logger.start();  
 }
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
     Logger.recordOutput("Robot/LoopTimeSec", edu.wpi.first.wpilibj.Timer.getFPGATimestamp() );
-    SmartDashboard.putNumber("teste", 123);
     
     //robotContainer.updateDashboards();
    
@@ -62,16 +59,15 @@ public void robotInit() {
   public void disabledPeriodic() {}
 
   
-@Override
-public void autonomousInit() {
+  @Override
+  public void autonomousInit() {
+    //m_autonomousCommand = robotContainer.getAutonomousCommand();
 
-    m_autonomousCommand = robotContainer.getAutonomousCommand();
-
+    // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
-        m_autonomousCommand.schedule();
+      m_autonomousCommand.schedule();
     }
-}
-
+  }
 
   /** This function is called periodically during autonomous. */
   @Override

@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.auto_blocks.NamedCommandsRegistry;
 import frc.robot.commands.teleopDrive.DriveCommand;
+import frc.robot.commands.vision.AimAtTagCommand;
 // import frc.robot.commands.vision.AimAtTagCommand;
 import frc.robot.commands.vision.AlignWithPieceCommand;
 // import frc.robot.commands.vision.AimAtTagCommand.CameraSide;
@@ -39,35 +40,62 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 
 public class RobotContainer{
 
-private final CommandPS5Controller controller = new CommandPS5Controller(0);
-private final CommandJoystick logitech = new CommandJoystick(1);
+  // 0. Váriaveis
+  //public final double xSupplier, ySupplier;
 
-private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo"));
+  // 1. Controles
+  private final CommandPS5Controller controller;
+  private final CommandJoystick logitech;
 
-private final IntakeAngleManager intake = new IntakeAngleManager();
-private final StreamDeckIntakeAngleController streamDeck = new StreamDeckIntakeAngleController(intake);    
+  // 2. Subsystems (Hardware e Base)
+  private final SwerveSubsystem drivebase;
+  private final ViewSubsystem vision;
+  private final ShooterSubsystem shooterSubsystem;
+  private final IntakeAngleManager intake;
+  private final IntakeRollerSubsystem rollerSubsystem;
+  private final SpindexerSubsystem spindexerSubsystem;
+  private final PreShooterSubsystem preShooterSubsystem;
 
-private final IntakeRollerSubsystem rollerSubsystem = new IntakeRollerSubsystem();  
-private final IntakeManager rollerManager =  new IntakeManager(rollerSubsystem);
-private final StreamDeckIntakeRollerController rollerStreamDeck = new StreamDeckIntakeRollerController(rollerManager);
+  // 3. Managers (Lógica de Controle)
+  private final ShooterManager shooterManager;
+  private final IntakeManager rollerManager;
+  private final SpindexerManager spindexerManager;
+  private final PreShooterManager preShooterManager;
 
-private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem();
-private final SpindexerManager spindexerManager = new SpindexerManager(spindexerSubsystem);
+  // 4. Periféricos e Comandos Complexos
+  private final StreamDeckIntakeAngleController streamDeck;
+  private final StreamDeckIntakeRollerController rollerStreamDeck;
+  //private final AimAtTagCommand aimAtTag;
 
-private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
-private final ViewSubsystem vision = new ViewSubsystem();
-private final ShooterManager shooterManager = new ShooterManager(shooterSubsystem, vision);
+  
+  public RobotContainer() {
 
-private final PreShooterSubsystem preShooterSubsystem = new PreShooterSubsystem(); 
-private final PreShooterManager preShooterManager = new PreShooterManager(preShooterSubsystem);
+      // --- Instanciação dos Controles ---
+      controller = new CommandPS5Controller(Constants.PS5_ID);
+      logitech = new CommandJoystick(Constants.LOGITECH_ID);
 
-private final ClimberManager climbManager = new ClimberManager();
-
-
-//private final AimAtTagCommand aimAtTag = new AimAtTagCommand(drivebase, vision, AimAtTagCommand.CameraSide.FRONT);
+//private final ClimberManager climbManager = new ClimberManager();
 
 
-public RobotContainer(){
+      // --- Instanciação dos Subsystems ---
+      drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/neo"));
+      vision = new ViewSubsystem();
+      shooterSubsystem = new ShooterSubsystem();
+      intake = new IntakeAngleManager();
+      rollerSubsystem = new IntakeRollerSubsystem();
+      spindexerSubsystem = new SpindexerSubsystem();
+      preShooterSubsystem = new PreShooterSubsystem();
+
+      // --- Instanciação dos Managers (Injeção de Dependência) ---
+      shooterManager = new ShooterManager(shooterSubsystem, vision);
+      rollerManager = new IntakeManager(rollerSubsystem);
+      spindexerManager = new SpindexerManager(spindexerSubsystem);
+      preShooterManager = new PreShooterManager(preShooterSubsystem);
+
+    streamDeck = new StreamDeckIntakeAngleController(intake); //CONSERTAR 
+    rollerStreamDeck = new StreamDeckIntakeRollerController(rollerManager); // CONSERTAR 
+    //aimAtTag = new AimAtTagCommand(drivebase, vision, null, null, null); //CONSERTARRRR com xSupplier, ySupplier)
+
   configureBindings();
   DriverStation.silenceJoystickConnectionWarning(true);
 
@@ -76,8 +104,8 @@ public RobotContainer(){
     vision,
     shooterManager,
     preShooterManager,
-    spindexerManager,
-    climbManager
+    spindexerManager
+    //climbManager
 );
   vision.selectAllHubTags();
   vision.selectAllTowerTags();
@@ -89,25 +117,24 @@ private void configureBindings(){
    * ==================== PILOTO DE LOCOMOÇÃO ====================
      =================== ==================== ==================== */
   
+//  drivebase.setDefaultCommand(
+//     new DriveCommand(
+//         drivebase,
+//         () -> {
+//             if (controller.povUp().getAsBoolean()) return 0.6;
+//             if (controller.povDown().getAsBoolean()) return -0.6;
+//             return ySupplier;
+//         },
 
- drivebase.setDefaultCommand(
-    new DriveCommand(
-        drivebase,
-        () -> {
-            if (controller.povUp().getAsBoolean()) return 0.6;
-            if (controller.povDown().getAsBoolean()) return -0.6;
-            return -controller.getLeftY();
-        },
+//         () -> {
+//             if (controller.povRight().getAsBoolean()) return -0.6;
+//             if (controller.povLeft().getAsBoolean()) return 0.6;
+//             return xSupplier;
+//         },
 
-        () -> {
-            if (controller.povRight().getAsBoolean()) return -0.6;
-            if (controller.povLeft().getAsBoolean()) return 0.6;
-            return -controller.getLeftX();
-        },
-
-        () -> controller.getRightX()
-    )
-);
+//         () -> controller.getRightX()
+//     )
+// );
   controller.options().onTrue(
   Commands.runOnce(drivebase::zeroGyroWithAlliance)
 );
@@ -116,9 +143,11 @@ private void configureBindings(){
 //     new AimAtTagCommand(
 //         drivebase,
 //         vision,
-//         AimAtTagCommand.CameraSide.BACK
+//         AimAtTagCommand.CameraSide.BACK,
+//         xSupplier,
+//         ySupplier
 //     )
-// );;
+// );
 
 
   /* ==================== =================== ====================
@@ -193,15 +222,13 @@ private void configureBindings(){
   logitech.povUp().onTrue(
     new InstantCommand(() -> shooterManager.toggleShooter())
   );
-  
-}
+  }
 
-public Command getAutonomousCommand() {
- return new PathPlannerAuto("AutoFix");
-}
+  public Command getAutonomousCommand() {
+  return new PathPlannerAuto("AutoFix");
+  }
 
-public void setMotorBrake(boolean brake)
-{
-  drivebase.setMotorBrake(brake);
-}
+    public void setMotorBrake(boolean brake){
+      drivebase.setMotorBrake(brake);
+  }
 }

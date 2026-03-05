@@ -1,7 +1,10 @@
 package frc.robot.commands.vision;
 
+import java.lang.constant.Constable;
+
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,6 +18,7 @@ public class AimAtTagCommand extends Command {
   private final SwerveSubsystem swerve;
   private final ViewSubsystem vision;
   private final CameraSide side;
+  private final double xSupplier, ySupplier;
 
   private static final double FRONT_CAMERA_OFFSET_RAD =
     Units.degreesToRadians(2); // ajuste fino para alinhar melhor com a torre, já que o centro da câmera frontal não é exatamente o centro do robô 
@@ -31,11 +35,15 @@ public class AimAtTagCommand extends Command {
   public AimAtTagCommand(
       SwerveSubsystem swerve,
       ViewSubsystem vision,
-      CameraSide side) {
+      CameraSide side,
+      double xSupplier,
+      double ySupplier) {
 
     this.swerve = swerve;
     this.vision = vision;
     this.side = side;
+    this.xSupplier = xSupplier;
+    this.ySupplier = ySupplier;
 
     headingPID.enableContinuousInput(-Math.PI, Math.PI);
     addRequirements(swerve);
@@ -72,7 +80,7 @@ public class AimAtTagCommand extends Command {
     double rot = headingPID.calculate(tx, 0.0);
     rot = Math.max(Math.min(rot, 3.0), -3.0);
 
-    swerve.drive(new Translation2d(), rot, false);
+    swerve.drive(new Translation2d(xSupplier, ySupplier), rot, false);
   }
 
   @Override

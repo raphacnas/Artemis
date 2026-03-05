@@ -20,8 +20,8 @@ public class NamedCommandsRegistry {
       ViewSubsystem vision,
       ShooterManager shooter,
       PreShooterManager preshooter,
-      SpindexerManager spindexer,
-      ClimberManager climb
+      SpindexerManager spindexer
+    //   ClimberManager climb
   ) {
 
     // ================= SHOOTER =================
@@ -62,26 +62,26 @@ public class NamedCommandsRegistry {
 
     // ================= CLIMB =================
 
-    NamedCommands.registerCommand(
-        "ClimbExtend",
-        Commands.runOnce(() -> climb.goToMax())
-    );
+    // NamedCommands.registerCommand(
+    //     "ClimbExtend",
+    //     Commands.runOnce(() -> climb.goToMax())
+    // );
 
-    NamedCommands.registerCommand(
-        "ClimbRetract",
-        Commands.runOnce(() -> climb.goToMin())
-    );
+    // NamedCommands.registerCommand(
+    //     "ClimbRetract",
+    //     Commands.runOnce(() -> climb.goToMin())
+    // );
 
     // ================= AIM =================
 
-    NamedCommands.registerCommand(
-        "AimFront",
-        new AimAtTagCommand(drive, vision, CameraSide.FRONT)
-    );
+    // NamedCommands.registerCommand(
+    //     // "AimFront",
+    //     // new AimAtTagCommand(drive, vision, CameraSide.FRONT)
+    // );
 
-    NamedCommands.registerCommand(
-        "AimBack",
-        new AimAtTagCommand(drive, vision, CameraSide.BACK)
-    );
+    // NamedCommands.registerCommand(
+    //     // "AimBack",
+    //     // new AimAtTagCommand(drive, vision, CameraSide.BACK)
+    // );
   }
 }
