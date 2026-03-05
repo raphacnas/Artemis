@@ -16,8 +16,8 @@ public class AutoGoAndAlignOutpost extends SequentialCommandGroup {
 
         Map<String, Command> eventMap = new HashMap<>();
         eventMap.put("SelectOutpostTag", new InstantCommand(view::selectTagOutpost));
-        eventMap.put("AimAtTag", new AimAtTagCommand(swerve, view, CameraSide.BACK, 0, 0)
-                                     .withTimeout(1.0)); 
+        // eventMap.put("AimAtTag", new AimAtTagCommand(swerve, view, CameraSide.BACK, 0, 0)
+        //                              .withTimeout(1.0)); 
 
         Command pathCommand = new InstantCommand();
         addCommands(pathCommand);

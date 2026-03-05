@@ -74,7 +74,7 @@ public class ShooterManager extends SubsystemBase {
     @Override
     public void periodic() {
         
-        System.out.println("Distance: " + vision.getBackDistanceToTag());
+        // System.out.println("Distance: " + vision.getBackDistanceToTag());
 
         if (state == ShooterState.IDLE || state == ShooterState.DISABLED) {
             shooter.stop();

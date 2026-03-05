@@ -1,10 +1,9 @@
 package frc.robot.commands.vision;
 
-import java.lang.constant.Constable;
+import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,7 +17,9 @@ public class AimAtTagCommand extends Command {
   private final SwerveSubsystem swerve;
   private final ViewSubsystem vision;
   private final CameraSide side;
-  private final double xSupplier, ySupplier;
+
+  private final DoubleSupplier xSupplier;
+  private final DoubleSupplier ySupplier;
 
   private final ProfiledPIDController headingPID =
       new ProfiledPIDController(
@@ -33,8 +34,8 @@ public class AimAtTagCommand extends Command {
       SwerveSubsystem swerve,
       ViewSubsystem vision,
       CameraSide side,
-      double xSupplier,
-      double ySupplier) {
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier) {
 
     this.swerve = swerve;
     this.vision = vision;
@@ -48,7 +49,7 @@ public class AimAtTagCommand extends Command {
 
   @Override
   public void initialize() {
-    headingPID.reset(0, 0); // 🔥 reset seguro
+    headingPID.reset(0);
   }
 
   @Override
@@ -62,7 +63,12 @@ public class AimAtTagCommand extends Command {
             : vision.hasValidBackTarget();
 
     if (!valid) {
-      swerve.drive(new Translation2d(), 0.0, false);
+      swerve.drive(
+          new Translation2d(
+              xSupplier.getAsDouble(),
+              ySupplier.getAsDouble()),
+          0.0,
+          false);
       return;
     }
 
@@ -75,7 +81,12 @@ public class AimAtTagCommand extends Command {
 
     rot = Math.max(Math.min(rot, 3.0), -3.0);
 
-    swerve.drive(new Translation2d(xSupplier, ySupplier), rot, false);
+    swerve.drive(
+        new Translation2d(
+            xSupplier.getAsDouble(),
+            ySupplier.getAsDouble()),
+        rot,
+        false);
   }
 
   @Override

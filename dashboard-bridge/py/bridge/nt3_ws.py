@@ -2,14 +2,13 @@ import asyncio
 import json
 import time
 import websockets
-from ntcore import NetworkTableInstance
+from networktables import NetworkTables
 
 clients = set()
-ntinst = NetworkTableInstance.getDefault()
 PULSE_TIME = 0.2
 
 # =========================
-# SUAS TABLES[]
+# SUAS TABLES
 # =========================
 
 TABLES_AND_KEYS = {
@@ -53,62 +52,57 @@ TABLES_AND_KEYS = {
 }
 
 # =========================
-# NT4 INIT
+# NT3 INIT
 # =========================
 
 def init_nt(server_ip: str):
-    ntinst.startClient4("dashboard-bridge")
-    ntinst.setServer(server_ip)
+    NetworkTables.initialize(server=server_ip)
 
-    print(f"🔗 Conectando NT4 -> {server_ip}")
+    print(f"🔗 Conectando NT3 -> {server_ip}")
 
     for _ in range(20):
-        if ntinst.isConnected():
-            print("✅ NT4 conectado!")
+        if NetworkTables.isConnected():
+            print("✅ NT3 conectado!")
             return
         time.sleep(0.5)
 
-    print("❌ NT4 não conectou")
+    print("❌ NT3 não conectou")
 
 
 def get_table(name):
-    return ntinst.getTable(name)
+    return NetworkTables.getTable(name)
 
 
 def read_value(table, key):
-    entry = table.getEntry(key)
-    if entry.exists():
-        v = entry.getValue()
-        if v:
-            return v.value()
-    return None
+    keys = table.getKeys()
+    if key not in keys:
+        return None
+
+    # tenta ler como número
+    val = table.getValue(key, None)
+    return val
 
 
 def ensure_entry_exists(table, key):
-    entry = table.getEntry(key)
-    if not entry.exists():
-        # força criação com tipo double padrão
-        entry.setDouble(0.0)
+    if key not in table.getKeys():
+        table.putNumber(key, 0.0)
 
 
 def write_value(table, key, value):
-    entry = table.getEntry(key)
-
     if isinstance(value, bool):
-        entry.setBoolean(value)
+        table.putBoolean(key, value)
     elif isinstance(value, (int, float)):
-        entry.setDouble(float(value))
+        table.putNumber(key, value)
     elif isinstance(value, list):
-        entry.setDoubleArray(value)
+        table.putNumberArray(key, value)
     else:
-        entry.setString(str(value))
+        table.putString(key, str(value))
 
 
 async def pulse_button(table, key):
-    entry = table.getEntry(key)
-    entry.setBoolean(True)
+    table.putBoolean(key, True)
     await asyncio.sleep(PULSE_TIME)
-    entry.setBoolean(False)
+    table.putBoolean(key, False)
 
 
 # =========================
@@ -116,10 +110,10 @@ async def pulse_button(table, key):
 # =========================
 
 async def nt_monitor():
-    print("📡 Monitor NT iniciado")
+    print("📡 Monitor NT3 iniciado")
 
     while True:
-        if not ntinst.isConnected():
+        if not NetworkTables.isConnected():
             print("⚠️ NT desconectado — aguardando reconexão")
             await asyncio.sleep(2)
             continue
@@ -200,6 +194,3 @@ async def main_async(server_ip: str, port: int):
     ):
         print(f"🚀 WebSocket em ws://0.0.0.0:{port}")
         await asyncio.Future()
-
-    print("RobotStress:", ntinst.getTable("RobotStress").getKeys())
-    print("SmartDashboard:", ntinst.getTable("SmartDashboard").getKeys())
