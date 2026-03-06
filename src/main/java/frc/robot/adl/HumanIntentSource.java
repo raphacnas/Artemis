@@ -1,4 +1,5 @@
 package frc.robot.adl;
+
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringSubscriber;
 
@@ -27,7 +28,7 @@ public class HumanIntentSource {
             case "ACQUIRE_PIECE":
                 return HumanIntent.acquirePiece(
                     HumanIntent.GameZone.BUMP,
-                    true 
+                    true
                 );
 
             case "SCORE":

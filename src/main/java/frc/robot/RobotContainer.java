@@ -222,9 +222,8 @@ private final ADLManager adlManager;
   /* ================= AUTO ================= */
 
   public Command getAutonomousCommand() {
-    return new PathPlannerAuto("AutoRobotCenter");
-  }
-
+    return new PathPlannerAuto("AutoTaxiLeft");
+}
   /* ================= GETTERS ================= */
 
   public SwerveSubsystem getSwerveSubsystem() {

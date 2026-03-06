@@ -5,6 +5,7 @@ import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.StringSubscriber;
 import edu.wpi.first.math.geometry.Pose2d;
+
 public class RobotContextProvider {
 
     private final DoubleSubscriber batteryVoltageSub;
@@ -50,7 +51,6 @@ public class RobotContextProvider {
         endgameSub = nt.getBooleanTopic("/Game/Endgame").subscribe(false);
     }
 
-   
     public RobotContext build() {
 
         HumanIntent.GameZone zone;
@@ -63,7 +63,7 @@ public class RobotContextProvider {
         return new RobotContext.Builder()
             .battery(
                 batteryVoltageSub.get(),
-                stressScoreSub.get(), 
+                stressScoreSub.get(),
                 stressLevelSub.get(),
                 speedLimitedSub.get()
             )
