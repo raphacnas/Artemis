@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.6610834695061807,
-        "y": 5.485706954469991
+        "x": 3.661288096086462,
+        "y": 5.485415867022776
       },
       "isLocked": false,
       "linkedName": null
@@ -20,8 +20,8 @@
         "y": 5.0586506622516545
       },
       "prevControl": {
-        "x": 2.2487232903003602,
-        "y": 5.011425617939834
+        "x": 2.2483332184254015,
+        "y": 5.011750310947377
       },
       "nextControl": null,
       "isLocked": false,
@@ -67,7 +67,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -142.927
+    "rotation": -143.0
   },
   "reversed": false,
   "folder": "BLUE ALLIANCE ",

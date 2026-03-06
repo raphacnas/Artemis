@@ -61,7 +61,7 @@ public final class Constants {
     public static final double INTAKE_POWER = 1;
     public static final double OUTTAKE_POWER = -1;
 
-    public static final double ANGLE_MAX_OUTPUT = 0.0; //RESOLVERRR 
+    public static final double ANGLE_MAX_OUTPUT = 0.25;
 
   }
 
@@ -108,6 +108,10 @@ public final class Constants {
    
     public static final String PREF_MIN_KEY = "Climber min position";
     public static final String PREF_MAX_KEY = "Climber max position";
+}
+
+public static class ADLManager {
+    public static final double MIN_DECISION_INTERVAL = 0.1; 
 }
 
 }
