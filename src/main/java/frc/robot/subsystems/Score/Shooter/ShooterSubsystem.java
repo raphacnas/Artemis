@@ -46,6 +46,7 @@ public class ShooterSubsystem extends SubsystemBase {
         encoder = neoMotor.getEncoder();
     }
 
+    @SuppressWarnings("removal")
     public void setTargetRPM(double rpm) {
         targetRPM = rpm;
 

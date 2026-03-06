@@ -51,6 +51,7 @@ public class SwerveSubsystem extends SubsystemBase{
   private final SwerveDrive swerveDrive;
 
    public SwerveSubsystem(File directory){ 
+    @SuppressWarnings("unused")
     boolean blueAlliance = DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue;
         Pose2d startingPose = new Pose2d();
 

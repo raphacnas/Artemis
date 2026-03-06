@@ -14,6 +14,7 @@ public class PreShooterSubsystem extends SubsystemBase {
         Constants.PreShooterConstants.PRE_SHOOTER_ID,
         MotorType.kBrushed);
 
+    @SuppressWarnings("removal")
     public PreShooterSubsystem() {
         SparkMaxConfig config = new SparkMaxConfig();
 

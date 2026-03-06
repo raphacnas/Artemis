@@ -10,6 +10,7 @@ import frc.robot.subsystems.Sensors.ViewSubsystem;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public class AutoGoAndAlignOutpost extends SequentialCommandGroup {
 
     public AutoGoAndAlignOutpost(SwerveSubsystem swerve, ViewSubsystem view) {

@@ -10,10 +10,10 @@ public class RobotStressMonitor {
     }
 
     private double batteryStress(double voltage) {
-        if (voltage >= 11.0) return 0;
-        if (voltage >= 10.0) return 30;
+        if (voltage >= 12.0) return 0;
+        if (voltage >= 11.0) return 20;
+        if (voltage >= 10.0) return 45;
         if (voltage >= 9.0)  return 70;
-        if (voltage >= 8.0)  return 90;
         return 100;
     }
 

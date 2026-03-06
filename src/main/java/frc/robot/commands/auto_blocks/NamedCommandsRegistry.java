@@ -13,6 +13,7 @@ import frc.robot.subsystems.Score.PreShooter.PreShooterManager;
 import frc.robot.subsystems.Score.Spindexer.SpindexerManager;
 import frc.robot.subsystems.Score.Climb.ClimberManager;
 
+@SuppressWarnings("unused")
 public class NamedCommandsRegistry {
 
   public static void registerAll(

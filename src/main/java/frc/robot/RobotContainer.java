@@ -9,6 +9,9 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Dashboards.RobotStress.DashboardPublisherStress;
+import frc.robot.Dashboards.RobotStress.RobotStressController;
+import frc.robot.Dashboards.RobotStress.RobotStressMonitor;
 import frc.robot.commands.auto_blocks.NamedCommandsRegistry;
 import frc.robot.commands.teleopDrive.DriveCommand;
 import frc.robot.commands.vision.AimAtTagCommand;
@@ -55,6 +58,11 @@ public class RobotContainer {
   private final SpindexerManager spindexerManager;
   private final PreShooterManager preShooterManager;
 
+  /* ================= DASHBOARD ================= */
+  private final RobotStressMonitor stressMonitor;
+  private final RobotStressController stressController;
+  private final DashboardPublisherStress stressPublisher;
+
   public RobotContainer() {
 
     /* ========= CONTROLLERS ========= */
@@ -80,6 +88,11 @@ public class RobotContainer {
     rollerManager = new IntakeRollerManager(rollerSubsystem);
     spindexerManager = new SpindexerManager(spindexerSubsystem);
     preShooterManager = new PreShooterManager(preShooterSubsystem, vision, shooterManager);
+
+    /* ========= DASHBOARD ========= */
+    stressMonitor = new RobotStressMonitor();
+    stressController = new RobotStressController();
+    stressPublisher = new DashboardPublisherStress();
 
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -199,6 +212,16 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return new PathPlannerAuto("AutoFix");
+  }
+
+  public void periodic() {
+    var stressData = stressMonitor.generateData(drivebase);
+    stressController.update(stressData);
+
+    double speedScale = stressController.getSpeedScale();
+    double chassisSpeed = drivebase.getRobotVelocity().vxMetersPerSecond;
+
+    stressPublisher.publish(stressData, speedScale, chassisSpeed);
   }
 
   /* ================= GETTERS ================= */
