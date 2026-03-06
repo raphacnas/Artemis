@@ -21,8 +21,8 @@ public class NamedCommandsRegistry {
       ViewSubsystem vision,
       ShooterManager shooter,
       PreShooterManager preshooter,
-      SpindexerManager spindexer
-    //   ClimberManager climb
+      SpindexerManager spindexer,
+      ClimberManager climber
   ) {
 
     // ================= SHOOTER =================
@@ -53,7 +53,7 @@ public class NamedCommandsRegistry {
 
     NamedCommands.registerCommand(
         "SpindexerStart",
-        Commands.runOnce(() -> spindexer.toggleSpin())
+        Commands.runOnce(() -> spindexer.start())
     );
 
     NamedCommands.registerCommand(
@@ -63,26 +63,27 @@ public class NamedCommandsRegistry {
 
     // ================= CLIMB =================
 
-    // NamedCommands.registerCommand(
-    //     "ClimbExtend",
-    //     Commands.runOnce(() -> climb.goToMax())
-    // );
-
-    // NamedCommands.registerCommand(
-    //     "ClimbRetract",
-    //     Commands.runOnce(() -> climb.goToMin())
-    // );
+    NamedCommands.registerCommand("ClimbExtend",
+        Commands.runOnce(() -> climber.goToMax())
+    );
+    NamedCommands.registerCommand("ClimbRetract",
+        Commands.runOnce(() -> climber.goToMin())
+    );
 
     // ================= AIM =================
 
-    // NamedCommands.registerCommand(
-    //     // "AimFront",
-    //     // new AimAtTagCommand(drive, vision, CameraSide.FRONT)
-    // );
+    NamedCommands.registerCommand(
+    "AimFront",
+    new AimAtTagCommand(drive, vision, CameraSide.FRONT,
+        () -> 0.0,  
+        () -> 0.0)
+);
 
-    // NamedCommands.registerCommand(
-    //     // "AimBack",
-    //     // new AimAtTagCommand(drive, vision, CameraSide.BACK)
-    // );
+NamedCommands.registerCommand(
+    "AimBack",
+    new AimAtTagCommand(drive, vision, CameraSide.BACK,
+        () -> 0.0,
+        () -> 0.0)
+);
   }
 }

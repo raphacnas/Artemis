@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.456663907284768,
-        "y": 5.341788079470198
+        "x": 2.527,
+        "y": 5.059
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.6610834695061807,
-        "y": 5.485706954469991
+        "x": 2.825310665208605,
+        "y": 5.0194423749651795
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.5273923841059602,
-        "y": 5.0586506622516545
+        "x": 1.5763410596026488,
+        "y": 4.027740066225165
       },
       "prevControl": {
-        "x": 2.2487232903003602,
-        "y": 5.011425617939834
+        "x": 1.5351911167552732,
+        "y": 4.577338068355052
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,25 +33,31 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "ShooterStart",
-      "waypointRelativePos": 0,
+      "name": "ShooterStop",
+      "waypointRelativePos": 0.55,
       "endWaypointRelativePos": null,
       "command": null
     },
     {
-      "name": "ClimbExtender",
-      "waypointRelativePos": 0,
+      "name": "PreShooterStop",
+      "waypointRelativePos": 0.55,
       "endWaypointRelativePos": null,
       "command": null
     },
     {
-      "name": "PreShooterFeed",
-      "waypointRelativePos": 1.0,
+      "name": "SpindexerStop",
+      "waypointRelativePos": 0.55,
       "endWaypointRelativePos": null,
       "command": null
     },
     {
-      "name": "SpindexerStart",
+      "name": "AimFront",
+      "waypointRelativePos": 0.9485619469026516,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "ClimbRetract",
       "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null
@@ -67,13 +73,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -142.927
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": "BLUE ALLIANCE ",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -143.0
   },
   "useDefaultConstraints": true
 }

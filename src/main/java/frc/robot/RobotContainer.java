@@ -12,10 +12,15 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Dashboards.RobotStress.DashboardPublisherStress;
 import frc.robot.Dashboards.RobotStress.RobotStressController;
 import frc.robot.Dashboards.RobotStress.RobotStressMonitor;
+import frc.robot.adl.ADLExecutor;
+import frc.robot.adl.ADLManager;
+import frc.robot.adl.HumanIntentSource;
+import frc.robot.adl.RobotContextProvider;
 import frc.robot.commands.auto_blocks.NamedCommandsRegistry;
 import frc.robot.commands.teleopDrive.DriveCommand;
 import frc.robot.commands.vision.AimAtTagCommand;
 import frc.robot.subsystems.Score.Angular.IntakeAngleManager;
+import frc.robot.subsystems.Score.Climb.ClimberManager;
 import frc.robot.subsystems.Score.PreShooter.PreShooterManager;
 import frc.robot.subsystems.Score.PreShooter.PreShooterSubsystem;
 import frc.robot.subsystems.Score.Rollers.IntakeRollerManager;
@@ -57,6 +62,12 @@ public class RobotContainer {
   private final IntakeRollerManager rollerManager;
   private final SpindexerManager spindexerManager;
   private final PreShooterManager preShooterManager;
+  private final ClimberManager climberManager;
+
+  /* =========== ADL =========== */
+private final ADLExecutor adlExecutor;
+private final ADLManager adlManager;
+
 
   /* ================= DASHBOARD ================= */
   private final RobotStressMonitor stressMonitor;
@@ -82,6 +93,7 @@ public class RobotContainer {
     rollerSubsystem = new IntakeRollerSubsystem();
     spindexerSubsystem = new SpindexerSubsystem();
     preShooterSubsystem = new PreShooterSubsystem();
+    climberManager = new ClimberManager();
 
     /* ========= MANAGERS ========= */
     shooterManager = new ShooterManager(shooterSubsystem, vision);
@@ -93,6 +105,16 @@ public class RobotContainer {
     stressMonitor = new RobotStressMonitor();
     stressController = new RobotStressController();
     stressPublisher = new DashboardPublisherStress();
+    /* ========= ADL ========= */
+   adlExecutor = new ADLExecutor(
+    intake, rollerManager, climberManager,
+    preShooterManager, shooterManager, spindexerManager  
+);
+   adlManager = new ADLManager(
+    new HumanIntentSource(),
+    new RobotContextProvider(),
+    adlExecutor
+);
 
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -102,7 +124,8 @@ public class RobotContainer {
         vision,
         shooterManager,
         preShooterManager,
-        spindexerManager
+        spindexerManager,
+        climberManager
     );
 
     // Tag selection is deferred to autonomousInit/teleopInit via refreshTagSelection()
@@ -194,7 +217,7 @@ public class RobotContainer {
     /* ================= PRESHOOTER ================= */
 
     logitech.povLeft().onTrue(
-        new InstantCommand(spindexerManager::toggleSpin)
+        new InstantCommand(spindexerManager::start)
     );
 
     logitech.povDown().onTrue(
@@ -211,7 +234,7 @@ public class RobotContainer {
   /* ================= AUTO ================= */
 
   public Command getAutonomousCommand() {
-    return new PathPlannerAuto("AutoFix");
+    return new PathPlannerAuto("AutoRobotCenter");
   }
 
   public void periodic() {
@@ -238,4 +261,8 @@ public class RobotContainer {
   public void setMotorBrake(boolean brake) {
     drivebase.setMotorBrake(brake);
   }
+
+  public ADLManager getAdlManager() {
+    return adlManager;
+}
 }

@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "TO_HUB_BLUE 1"
+            "pathName": "TO_HUB_BLUE 2 "
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "TO_TOWER_BLUE 1"
+            "pathName": "TO_TOWER_BLUE 2"
           }
         }
       ]

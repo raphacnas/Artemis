@@ -46,7 +46,10 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    m_robotContainer.getAdlManager().periodic();
+
+  }
 
   @Override
   public void teleopInit() {
@@ -62,7 +65,10 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    m_robotContainer.getAdlManager().periodic();
+
+  }
 
   @Override
   public void testInit() {
