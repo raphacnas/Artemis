@@ -186,7 +186,7 @@ public class IntakeAngleManager extends SubsystemBase {
                     autoActive = false;
                     currentState = ControlState.DISABLED;
                     loopsAtSetpoint = 0;
-                    System.out.println("✅ Posição atingida!");
+                    System.out.println(" Posição atingida!");
                     SmartDashboard.putString("Intake/Status", "Posição atingida");
                 }
             } else {
@@ -194,7 +194,7 @@ public class IntakeAngleManager extends SubsystemBase {
             }
 
         } catch (Exception e) {
-            System.err.println("❌ Erro em moveAutomatic: " + e.getMessage());
+            System.err.println("Erro em moveAutomatic: " + e.getMessage());
             e.printStackTrace();
             stop();
         }
@@ -207,21 +207,21 @@ public class IntakeAngleManager extends SubsystemBase {
             currentState = ControlState.DISABLED;
             loopsAtSetpoint = 0;
             lastOutput = 0.0;
-            System.out.println("🛑 Intake parado");
+            System.out.println("Intake parado");
             SmartDashboard.putString("Intake/Status", "Parado");
             SmartDashboard.putString("Intake/Mode", "DISABLED");
         } catch (Exception e) {
-            System.err.println("❌ Erro ao parar: " + e.getMessage());
+            System.err.println("Erro ao parar: " + e.getMessage());
         }
     }
 
     public void calibrateZero() {
         try {
             intake.recalibrateZero();
-            System.out.println("✅ ZERO calibrado!");
-            SmartDashboard.putString("Intake/Calibration", "✅ ZERO salvo!");
+            System.out.println("ZERO calibrado!");
+            SmartDashboard.putString("Intake/Calibration", "ZERO salvo!");
         } catch (Exception e) {
-            System.err.println("❌ Erro ao calibrar ZERO: " + e.getMessage());
+            System.err.println(" Erro ao calibrar ZERO: " + e.getMessage());
         }
     }
 
@@ -231,11 +231,11 @@ public class IntakeAngleManager extends SubsystemBase {
             targetAngleDeg = currentAngle;
             Preferences.setDouble("IntakeAngleTarget", targetAngleDeg);
 
-            System.out.println("✅ TARGET calibrado em: " + targetAngleDeg + "°");
-            SmartDashboard.putString("Intake/Calibration", "✅ TARGET salvo!");
+            System.out.println("TARGET calibrado em: " + targetAngleDeg + "°");
+            SmartDashboard.putString("Intake/Calibration", "TARGET salvo!");
             SmartDashboard.putNumber("Intake/TargetAngleSaved", targetAngleDeg);
         } catch (Exception e) {
-            System.err.println("❌ Erro ao calibrar TARGET: " + e.getMessage());
+            System.err.println("Erro ao calibrar TARGET: " + e.getMessage());
         }
     }
 
@@ -247,7 +247,7 @@ public class IntakeAngleManager extends SubsystemBase {
         try {
             return intake.getAngleDeg();
         } catch (Exception e) {
-            System.err.println("❌ Erro ao obter ângulo: " + e.getMessage());
+            System.err.println("Erro ao obter ângulo: " + e.getMessage());
             return 0.0;
         }
     }
