@@ -34,25 +34,22 @@ public class ADLExecutor {
 
     public void execute(ADLState state) {
         switch (state) {
-
             case ACQUIRING:
                 intakeAngle.moveToTargetPosition();
                 intakeRoller.toggleIntake();
                 break;
-
             case SCORING:
-         intakeRoller.stop();
-         shooter.enable();
-         spindexer.start();        
-         preShooter.enableAuto();
-        break;
+                intakeRoller.stop();
+                shooter.enable();
+                spindexer.start();
+                preShooter.enableAuto();
+                break;
             case CLIMBING:
                 intakeRoller.stop();
                 preShooter.stop();
                 shooter.disable();
                 climb.goToMax();
                 break;
-
             case EMERGENCY:
                 intakeRoller.stop();
                 preShooter.stop();
@@ -60,7 +57,6 @@ public class ADLExecutor {
                 climb.setStopManualClimb();
                 intakeAngle.stop();
                 break;
-
             case IDLE:
             default:
                 intakeRoller.stop();

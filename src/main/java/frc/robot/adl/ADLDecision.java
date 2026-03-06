@@ -1,8 +1,7 @@
 package frc.robot.adl;
 
 public class ADLDecision {
-
-    public static DecisionResult decide(
+ public static DecisionResult decide(
         HumanIntent intent,
         ADLState currentState,
         RobotContext context
@@ -33,16 +32,14 @@ public class ADLDecision {
             );
         }
 
-        if (!context.isRobotHealthy()
-                && intent.getUrgency() < 0.9) {
+        if (!context.isRobotHealthy() && intent.getUrgency() < 0.9) {
             return DecisionResult.reject(
                 currentState,
                 "Robô sob stress alto"
             );
         }
 
-        if (context.endgame
-                && intent.getType() != HumanIntent.Type.CLIMB) {
+        if (context.endgame && intent.getType() != HumanIntent.Type.CLIMB) {
             return DecisionResult.reject(
                 currentState,
                 "Endgame: apenas climb permitido"
@@ -57,48 +54,20 @@ public class ADLDecision {
         }
 
         switch (intent.getType()) {
-
             case ACQUIRE_PIECE:
-                return DecisionResult.execute(
-                    ADLState.ACQUIRING,
-                    "Adquirindo peça em " + intent.getTargetZone()
-                );
-
+                return DecisionResult.execute(ADLState.ACQUIRING, "Adquirindo peça em " + intent.getTargetZone());
             case SCORE_PIECE:
-                return DecisionResult.execute(
-                    ADLState.SCORING,
-                    "Pontuando em " + intent.getTargetZone()
-                );
-
+                return DecisionResult.execute(ADLState.SCORING, "Pontuando em " + intent.getTargetZone());
             case MOVE_TO_ZONE:
-                return DecisionResult.execute(
-                    ADLState.MOVING,
-                    "Movendo para " + intent.getTargetZone()
-                );
-
+                return DecisionResult.execute(ADLState.MOVING, "Movendo para " + intent.getTargetZone());
             case CLIMB:
-                return DecisionResult.execute(
-                    ADLState.CLIMBING,
-                    "Iniciando climb"
-                );
-
+                return DecisionResult.execute(ADLState.CLIMBING, "Iniciando climb");
             case HOLD_POSITION:
-                return DecisionResult.execute(
-                    ADLState.IDLE,
-                    "Mantendo posição"
-                );
-
+                return DecisionResult.execute(ADLState.IDLE, "Mantendo posição");
             case ESCAPE:
-                return DecisionResult.execute(
-                    ADLState.MOVING,
-                    "Manobra de escape"
-                );
-
+                return DecisionResult.execute(ADLState.MOVING, "Manobra de escape");
             default:
-                return DecisionResult.reject(
-                    currentState,
-                    "Intenção desconhecida"
-                );
+                return DecisionResult.reject(currentState, "Intenção desconhecida");
         }
     }
 }

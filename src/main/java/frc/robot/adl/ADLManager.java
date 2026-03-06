@@ -29,29 +29,24 @@ public class ADLManager {
         this.executor        = executor;
 
         var nt = NetworkTableInstance.getDefault();
-        statePub   = nt.getStringTopic("/ADL/state").publish();
+        statePub    = nt.getStringTopic("/ADL/state").publish();
         decisionPub = nt.getStringTopic("/ADL/decision").publish();
 
         publishState("ADL inicializado");
     }
 
     public void periodic() {
-
         HumanIntent intent = intentSource.pollIntent();
         RobotContext context = contextProvider.build();
         double now = Timer.getFPGATimestamp();
 
         if (intent == null) return;
 
-        if (now - lastDecisionTime < Constants.ADLManager.MIN_DECISION_INTERVAL) {
-            return;
-        }
+        if (now - lastDecisionTime < Constants.ADLManager.MIN_DECISION_INTERVAL) return;
 
         DecisionResult result = ADLDecision.decide(intent, currentState, context);
-
         lastDecision = result;
         lastDecisionTime = now;
-
         handleDecision(result);
     }
 
@@ -81,11 +76,6 @@ public class ADLManager {
         decisionPub.set(reason);
     }
 
-    public ADLState getCurrentState() {
-        return currentState;
-    }
-
-    public DecisionResult getLastDecision() {
-        return lastDecision;
-    }
+    public ADLState getCurrentState() { return currentState; }
+    public DecisionResult getLastDecision() { return lastDecision; }
 }
