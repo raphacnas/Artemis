@@ -15,7 +15,7 @@ import frc.robot.Dashboards.RobotStress.RobotStressController;
 import frc.robot.Dashboards.RobotStress.RobotStressMonitor;
 import frc.robot.commands.auto_blocks.NamedCommandsRegistry;
 import frc.robot.commands.teleopDrive.DriveCommand;
-import frc.robot.commands.vision.AimAtTagCommand;
+import frc.robot.commands.vision.AimLockCommand;
 import frc.robot.subsystems.Score.Climb.ClimberManager;
 import frc.robot.subsystems.Score.Angular.IntakeAngleManager;
 import frc.robot.subsystems.Score.PreShooter.PreShooterManager;
@@ -61,6 +61,10 @@ public class RobotContainer {
   private final PreShooterManager preShooterManager;
   private final ClimberManager climberManager;
 
+  /* ================= COMMANDS ================= */
+  private final AimLockCommand aimLockFront;
+  private final AimLockCommand aimLockBack;
+
   /* ================= DASHBOARD ================= */
   private final RobotStressMonitor stressMonitor;
   private final RobotStressController stressController;
@@ -99,6 +103,10 @@ public class RobotContainer {
     stressController = new RobotStressController();
     stressPublisher = new DashboardPublisherStress();
     modePublisher = new DriveModePublisher();
+
+    /* ========= COMMANDS ========= */
+    aimLockFront = new AimLockCommand(drivebase, vision, AimLockCommand.CameraSide.FRONT, xSupplier, ySupplier);
+    aimLockBack  = new AimLockCommand(drivebase, vision, AimLockCommand.CameraSide.BACK,  xSupplier, ySupplier);
 
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -146,15 +154,10 @@ public class RobotContainer {
     );
 
     // Aim at tag with back camera (toggle)
-    controller.square().toggleOnTrue(
-        new AimAtTagCommand(
-            drivebase,
-            vision,
-            AimAtTagCommand.CameraSide.BACK,
-            xSupplier,
-            ySupplier
-        )
-    );
+    controller.square().toggleOnTrue(aimLockBack);
+
+    // Aim at tag with front camera / Lime 4 (toggle)
+    controller.circle().toggleOnTrue(aimLockFront);
 
     /* ================= ANGLE ================= */
 
@@ -213,6 +216,16 @@ public class RobotContainer {
     logitech.povUp().onTrue(
         new InstantCommand(() -> shooterManager.toggleShooter(), shooterManager)
     );
+
+    /* ================= CLIMB ================= */
+
+    logitech.povUpRight().onTrue(
+      new InstantCommand(() -> climberManager.setClimbManual(0.8), climberManager)
+    );
+
+    logitech.povDownLeft().onTrue(
+      new InstantCommand(() -> climberManager.setClimbManual(-0.8), climberManager)
+    );
   }
 
   /* ================= AUTO ================= */
@@ -231,10 +244,11 @@ public class RobotContainer {
     stressPublisher.publish(stressData, speedScale, chassisSpeed);
 
     // Publish mode indicators to dashboard
-    modePublisher.publishAim(shooterManager.isEnabled() ? 1 : 0);
+    modePublisher.publishAim(aimLockBack.isActive() ? 1 : 0);
     modePublisher.publishAlign(
         preShooterManager.getMode() == PreShooterManager.ControlMode.AUTO_DISTANCE ? 1 : 0);
     modePublisher.publishShooterLime2Plus(shooterManager.isEnabled() ? 1 : 0);
+    modePublisher.publishAimLime4(aimLockFront.isActive() ? 1 : 0);
   }
 
   /* ================= GETTERS ================= */

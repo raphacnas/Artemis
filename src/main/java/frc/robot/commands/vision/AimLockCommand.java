@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.Sensors.ViewSubsystem;
 
-public class AimAtTagCommand extends Command {
+public class AimLockCommand extends Command {
 
   public enum CameraSide { FRONT, BACK }
 
@@ -33,7 +33,7 @@ public class AimAtTagCommand extends Command {
               Units.degreesToRadians(150),
               Units.degreesToRadians(300)));
 
-  public AimAtTagCommand(
+  public AimLockCommand(
       SwerveSubsystem swerve,
       ViewSubsystem vision,
       CameraSide side,
@@ -50,9 +50,16 @@ public class AimAtTagCommand extends Command {
     addRequirements(swerve);
   }
 
+  private boolean active = false;
+
+  public boolean isActive() {
+    return active;
+  }
+
   @Override
   public void initialize() {
     headingPID.reset(0);
+    active = true;
   }
 
   @Override
@@ -96,6 +103,7 @@ public class AimAtTagCommand extends Command {
 
   @Override
   public void end(boolean interrupted) {
+    active = false;
     swerve.drive(new Translation2d(), 0.0, false);
   }
 

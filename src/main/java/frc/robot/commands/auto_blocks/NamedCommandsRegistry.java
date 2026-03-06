@@ -4,8 +4,8 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj2.command.Commands;
 
-import frc.robot.commands.vision.AimAtTagCommand;
-import frc.robot.commands.vision.AimAtTagCommand.CameraSide;
+import frc.robot.commands.vision.AimLockCommand;
+import frc.robot.commands.vision.AimLockCommand.CameraSide;
 import frc.robot.subsystems.Sensors.ViewSubsystem;
 import frc.robot.subsystems.Swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.Score.Shooter.ShooterManager;
@@ -74,14 +74,14 @@ public class NamedCommandsRegistry {
 
     NamedCommands.registerCommand(
     "AimFront",
-    new AimAtTagCommand(drive, vision, CameraSide.FRONT,
+    new AimLockCommand(drive, vision, CameraSide.FRONT,
         () -> 0.0,  
         () -> 0.0)
 );
 
 NamedCommands.registerCommand(
     "AimBack",
-    new AimAtTagCommand(drive, vision, CameraSide.BACK,
+    new AimLockCommand(drive, vision, CameraSide.BACK,
         () -> 0.0,
         () -> 0.0)
 );
