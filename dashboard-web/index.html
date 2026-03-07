@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8">
-  <title>FRC Driver Dashboard</title>
+  <title>FRC Driver Dashboard — HYDRA #9163</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Teko:wght@300;400;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="./css/global.css">
   <link rel="stylesheet" href="./css/stress/stress.css">
   <link rel="stylesheet" href="./css/streamdeck/streamdeck.css">
-  
-</head>
+  <link rel="stylesheet" href="./css/adl/adl.css">
 
+</head>
 <body>
 
   <div id="dashboard-root">
@@ -18,60 +20,140 @@
     <header id="header">
       <img src="assets/logo.png" alt="Team Logo" id="team-logo">
       <h1>HYDRA #9163</h1>
+      <div class="conn-wrap">
+        <div class="conn-dot" id="conn-dot"></div>
+        <span class="conn-label" id="conn-label">OFFLINE</span>
+      </div>
     </header>
 
-    <!-- ================= ROBOT STRESS ================= -->
-    <section id="robot-stress" class="dashboard-panel">
-      <h2>Robot Stress</h2>
+    <div id="main-columns">
 
-      <div id="stress-status" class="status-box">
-        --
-      </div>
+      <!-- ═══ COLUNA ESQUERDA — ROBOT STRESS ═══ -->
+      <section id="robot-stress" class="dashboard-panel">
+        <h2>Robot Stress</h2>
 
-      <div class="metric">
-        <label>Battery Voltage</label>
-        <span id="battery-voltage">--.- V</span>
-      </div>
+        <div id="stress-status" class="status-box">--</div>
 
-      <div class="metric">
-        <label>Total Current</label>
-        <span id="total-current">--- A</span>
-      </div>
+        <div class="metric">
+          <label>Battery Voltage</label>
+          <span id="battery-voltage">--.- V</span>
+        </div>
+        <div class="metric">
+          <label>Total Current</label>
+          <span id="total-current">--- A</span>
+        </div>
+        <div class="metric">
+          <label>Drivetrain Current</label>
+          <span id="drivetrain-current">--- A</span>
+        </div>
+        <div class="metric">
+          <label>Stress Score</label>
+          <span id="stress-score">--</span>
+        </div>
+        <div class="metric">
+          <label>Speed Limit</label>
+          <span id="speed-scale">100%</span>
+        </div>
+        <div class="metric">
+          <label>Chassis Speed</label>
+          <span id="chassis-speed">0.00 m/s</span>
+        </div>
 
-      <div class="metric">
-        <label>Drivetrain Current</label>
-        <span id="drivetrain-current">--- A</span>
-      </div>
+        <div id="speed-warning" class="speed-warning hidden">
+          ⚠️ Bateria baixa — velocidade do drive reduzida automaticamente
+        </div>
+      </section>
 
-      <div class="metric">
-        <label>Stress Score</label>
-        <span id="stress-score">--</span>
-      </div>
+      <!-- ═══ COLUNA DIREITA — ADL ═══ -->
+      <section id="adl-column" class="dashboard-panel">
 
-      <div class="metric">
-        <label>Speed Limit</label>
-        <span id="speed-scale">100%</span>
-      </div>
+        <div id="adl-header-row">
+          <h2>Autonomous Decision Layer</h2>
+          <div class="endgame-banner hidden" id="endgame-banner">⚑ ENDGAME</div>
+        </div>
 
-      <div class="metric">
-        <label>Chassis Speed</label>
-        <span id="chassis-speed">0.00 m/s</span>
-      </div>
+        <!-- Estado -->
+        <div class="adl-block">
+          <div class="adl-block-title">Estado</div>
+          <div class="state-wrap">
+            <div class="state-icon" id="state-icon">○</div>
+            <div class="state-badge IDLE" id="state-badge">IDLE</div>
+          </div>
+          <div class="state-desc" id="state-desc">Aguardando intenção</div>
+        </div>
 
-      <div id="speed-warning" class="speed-warning hidden">
-        ⚠️ Bateria baixa — velocidade do drive reduzida automaticamente
-      </div>
-    </section>
+        <!-- Decisão -->
+        <div class="adl-block">
+          <div class="adl-block-title">Última Decisão</div>
+          <span class="dtype-badge" id="dtype-badge">—</span>
+          <div class="decision-reason" id="decision-reason">—</div>
+        </div>
 
+        <!-- Contexto -->
+        <div class="adl-block">
+          <div class="adl-block-title">Contexto</div>
+          <div class="ctx-grid">
+            <div class="ctx-item">
+              <span class="ctx-lbl">Visão</span>
+              <span class="ctx-pill" id="ctx-vision">OFF</span>
+            </div>
+            <div class="ctx-item">
+              <span class="ctx-lbl">Alinhado</span>
+              <span class="ctx-pill" id="ctx-aligned">OFF</span>
+            </div>
+            <div class="ctx-item">
+              <span class="ctx-lbl">Shooter</span>
+              <span class="ctx-pill" id="ctx-shooter">OFF</span>
+            </div>
+            <div class="ctx-item">
+              <span class="ctx-lbl">Game Piece</span>
+              <span class="ctx-pill" id="ctx-piece">OFF</span>
+            </div>
+            <div class="ctx-item">
+              <span class="ctx-lbl">Endgame</span>
+              <span class="ctx-pill" id="ctx-endgame">OFF</span>
+            </div>
+            <div class="ctx-item">
+              <span class="ctx-lbl">Em Movimento</span>
+              <span class="ctx-pill" id="ctx-moving">OFF</span>
+            </div>
+            <div class="ctx-item full">
+              <span class="ctx-lbl">Shooter RPM</span>
+              <span class="ctx-val" id="ctx-rpm">-- / -- rpm</span>
+            </div>
+          </div>
+        </div>
 
+        <!-- Intenções -->
+        <div class="adl-block">
+          <div class="adl-block-title">Enviar Intenção</div>
+          <div class="intent-grid">
+            <button class="ibtn acquire" onclick="sendIntent('ACQUIRE_PIECE')">⬇ Coletar</button>
+            <button class="ibtn score"   onclick="sendIntent('SCORE')">◎ Pontuar</button>
+            <button class="ibtn move"    onclick="sendIntent('MOVE_DEPOT')">→ Depot</button>
+            <button class="ibtn climb"   onclick="sendIntent('CLIMB')">↑ Escalar</button>
+            <button class="ibtn hold"    onclick="sendIntent('HOLD_POSITION')">○ Hold</button>
+            <button class="ibtn abort"   onclick="sendIntent('ABORT')">⚠ ABORT</button>
+          </div>
+        </div>
 
-    <section id="StreamDeck - ADL" class="dashboard-panel">
-      <h2>Stream Deck</h2>
+        <!-- Log -->
+        <div class="adl-block adl-log-block">
+          <div class="adl-block-title">
+            Log
+            <button class="log-clear-btn" onclick="clearLog()">limpar</button>
+          </div>
+          <div class="log-list" id="log-list"></div>
+        </div>
 
+      </section>
+
+    </div>
   </div>
 
-  <script src="js/stress/stress.js"></script>
-  <script src="js/streamdeck/streamdeck.js"></script>
+ <script type="module" src="js/ws.js"></script>
+<script type="module" src="js/stress/stress.js"></script>
+<script type="module" src="js/adl/adl.js"></script>
 
 </body>
 </html>

@@ -21,6 +21,43 @@ TABLES_AND_KEYS = {
         "speedScale",
         "chassisSpeed"
     ],
+
+    "ADL": [
+        "state",
+        "decision",
+        "intent"
+    ],
+
+    "Vision": [
+        "HasTarget",
+        "Aligned",
+        "Confidence"
+    ],
+
+    "Mechanisms": [
+        "ShooterReady",
+        "HasGamePiece",
+        "IntakeActive",
+        "ClimbAvailable"
+    ],
+
+    "Game": [
+        "Endgame"
+    ],
+
+    "Drive": [
+        "Moving"
+    ],
+
+    "Robot": [
+        "BatteryVoltage"
+    ],
+
+    "Shooter": [
+        "CurrentRPM",
+        "TargetRPM"
+    ],
+
     "StreamDeck/IntakeAngle": [
         "toggleCount",
         "calibrateZero",
@@ -62,17 +99,7 @@ TABLES_AND_KEYS = {
 
 def init_nt(server_ip: str):
     NetworkTables.initialize(server=server_ip)
-
-    print(f"🔗 Conectando NT3 -> {server_ip}")
-
-    for _ in range(20):
-        if NetworkTables.isConnected():
-            print("✅ NT3 conectado!")
-            return
-        time.sleep(0.5)
-
-    print("❌ NT3 não conectou")
-
+    print(f"🔗 NT3 -> {server_ip} (aguardando...)")
 
 def get_table(name):
     return NetworkTables.getTable(name)
@@ -128,7 +155,6 @@ async def nt_monitor():
 
             for key in keys:
                 ensure_entry_exists(table, key)
-
                 value = read_value(table, key)
 
                 if value is not None:
@@ -148,7 +174,6 @@ async def nt_monitor():
                         clients.discard(ws)
 
         await asyncio.sleep(0.1)
-
 
 # =========================
 # WEBSOCKET

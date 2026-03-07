@@ -218,7 +218,7 @@ public class RobotContainer {
   /* ================= AUTO ================= */
 
   public Command getAutonomousCommand() {
-    return new PathPlannerAuto("AutoTaxiLeft");
+    return new PathPlannerAuto("AutoTaxiHUB");
   }
 
   public void periodic() {

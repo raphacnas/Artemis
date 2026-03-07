@@ -67,7 +67,7 @@ public final class Constants {
 
   public static class SpindexerConstants {
 
-    public static final double SPIN_POWER = -1;
+    public static final double SPIN_POWER = 1;
     public static final int SPINNER_ID = 11;
   
   }

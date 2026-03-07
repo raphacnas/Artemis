@@ -45,7 +45,7 @@ public class DriveCommand extends Command {
                     y * drivebase.getSwerveDrive().getMaximumChassisVelocity()),
                 0.8),
             Math.pow(rot, 3) * drivebase.getSwerveDrive().getMaximumChassisAngularVelocity(),
-            true
+            false
         );
     }
 }
