@@ -148,11 +148,7 @@ function startWS() {
         return;
       }
 
-      if (topic === TOPIC_ALIGN_LIME2) {
-        state.lime2.alinhador = clampInt(value, 0, 2, 0);
-        renderMode("alinhador-lime2", state.lime2.alinhador);
-        return;
-      }
+      // TOPIC_ALIGN_LIME2 retired — element removed from HTML
 
       // -------------------------
       // TEMPERATURA
