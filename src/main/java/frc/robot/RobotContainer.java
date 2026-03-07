@@ -16,6 +16,8 @@ import frc.robot.Dashboards.RobotStress.RobotStressMonitor;
 import frc.robot.commands.auto_blocks.NamedCommandsRegistry;
 import frc.robot.commands.teleopDrive.DriveCommand;
 import frc.robot.commands.vision.AimLockCommand;
+import frc.robot.commands.vision.AlignWithPieceCommand;
+import frc.robot.commands.vision.AlignWithPieceCommand;
 import frc.robot.subsystems.Score.Climb.ClimberManager;
 import frc.robot.subsystems.Score.Angular.IntakeAngleManager;
 import frc.robot.subsystems.Score.PreShooter.PreShooterManager;
@@ -64,6 +66,7 @@ public class RobotContainer {
   /* ================= COMMANDS ================= */
   private final AimLockCommand aimLockFront;
   private final AimLockCommand aimLockBack;
+  private final AlignWithPieceCommand alignWithPiece;
 
   /* ================= DASHBOARD ================= */
   private final RobotStressMonitor stressMonitor;
@@ -105,8 +108,9 @@ public class RobotContainer {
     modePublisher = new DriveModePublisher();
 
     /* ========= COMMANDS ========= */
-    aimLockFront = new AimLockCommand(drivebase, vision, AimLockCommand.CameraSide.FRONT, xSupplier, ySupplier);
-    aimLockBack  = new AimLockCommand(drivebase, vision, AimLockCommand.CameraSide.BACK,  xSupplier, ySupplier);
+    aimLockFront    = new AimLockCommand(drivebase, vision, AimLockCommand.CameraSide.FRONT, xSupplier, ySupplier);
+    aimLockBack     = new AimLockCommand(drivebase, vision, AimLockCommand.CameraSide.BACK,  xSupplier, ySupplier);
+    alignWithPiece  = new AlignWithPieceCommand(drivebase, vision);
 
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -158,6 +162,9 @@ public class RobotContainer {
 
     // Aim at tag with front camera / Lime 4 (toggle)
     controller.circle().toggleOnTrue(aimLockFront);
+
+    // Align with game piece using AI (toggle)
+    controller.cross().toggleOnTrue(alignWithPiece);
 
     /* ================= ANGLE ================= */
 
@@ -249,6 +256,7 @@ public class RobotContainer {
         preShooterManager.getMode() == PreShooterManager.ControlMode.AUTO_DISTANCE ? 1 : 0);
     modePublisher.publishShooterLime2Plus(shooterManager.isEnabled() ? 1 : 0);
     modePublisher.publishAimLime4(aimLockFront.isActive() ? 1 : 0);
+    modePublisher.publishAlignPiece(alignWithPiece.isActive() ? 1 : 0);
   }
 
   /* ================= GETTERS ================= */

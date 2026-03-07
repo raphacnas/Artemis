@@ -2,8 +2,8 @@
 // ESTADO GLOBAL
 // ==========================
 const state = {
-  lime4: { alinhador: 0, yaw: 0, teste1: 0 },
-  lime2: { alinhador: 0, yaw: 0, teste1: 0 },
+  lime4: { yaw: 0 },
+  lime2: { yaw: 0, alignPiece: 0 },
   lime2plus: { yaw: 0, shooter: 0 }
 };
 
@@ -39,16 +39,11 @@ function renderMode(id, value) {
 }
 
 function renderAll() {
-  renderMode("alinhador-lime4", state.lime4.alinhador);
-  renderMode("yaw-lime4",       state.lime4.yaw);
-  renderMode("teste1-lime4",    state.lime4.teste1);
-
-  renderMode("alinhador-lime2", state.lime2.alinhador);
-  renderMode("yaw-lime2",       state.lime2.yaw);
-  renderMode("teste1-lime2",    state.lime2.teste1);
-
-  renderMode("yaw-lime2plus",     state.lime2plus.yaw);
-  renderMode("shooter-lime2plus", state.lime2plus.shooter);
+  renderMode("yaw-lime4",          state.lime4.yaw);
+  renderMode("yaw-lime2",          state.lime2.yaw);
+  renderMode("align-piece",        state.lime2.alignPiece);
+  renderMode("yaw-lime2plus",      state.lime2plus.yaw);
+  renderMode("shooter-lime2plus",  state.lime2plus.shooter);
 }
 
 // ==========================
@@ -95,11 +90,12 @@ function extractTempFromHw(hwArr) {
 const WS_URL = "ws://127.0.0.1:5810/nt/dashboard";
 
 // MODOS (publicados pelo Java -> NT -> nt3_ws)
-const TOPIC_AIMLOCK_LIME4     = "/Modes/AimLockLime4"; // 0/1
-const TOPIC_AIMLOCK_LIME2     = "/Modes/AimLockLime2"; // 0/1
-const TOPIC_ALIGN_LIME2       = "/Modes/AlignLime2";   // 0/1/2
-const TOPIC_AIMLOCK_LIME2PLUS = "/Modes/AimLockLime2Plus"; // 0/1
-const TOPIC_SHOOTER_LIME2PLUS = "/Modes/ShooterLime2Plus"; // 0/1/2
+const TOPIC_AIMLOCK_LIME4     = "/Modes/AimLockLime4";
+const TOPIC_AIMLOCK_LIME2     = "/Modes/AimLockLime2";
+const TOPIC_ALIGN_LIME2       = "/Modes/AlignLime2";
+const TOPIC_AIMLOCK_LIME2PLUS = "/Modes/AimLockLime2Plus";
+const TOPIC_SHOOTER_LIME2PLUS = "/Modes/ShooterLime2Plus";
+const TOPIC_ALIGN_PIECE       = "/Modes/AlignPiece";
 
 // TEMP (publicados pela Limelight -> NT -> nt3_ws)
 const TOPIC_HW_LIME4     = "/limelight-front/hw";
@@ -188,6 +184,12 @@ function startWS() {
       if (topic === TOPIC_HW_LIME2PLUS) {
         const t = extractTempFromHw(value);
         setTemp("temp-lime2plus", t);
+        return;
+      }
+
+      if (topic === TOPIC_ALIGN_PIECE) {
+        state.lime2.alignPiece = clampInt(value, 0, 1, 0);
+        renderMode("align-piece", state.lime2.alignPiece);
         return;
       }
     };

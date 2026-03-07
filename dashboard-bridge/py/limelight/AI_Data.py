@@ -11,6 +11,7 @@ from limelight.RIO2WPILIB import (
     rio2wpi_ta,
     rio2wpi_has_target,
     rio2wpi_bbox,
+    rio2wpi_distance,
 )
 
 # =========================
@@ -186,6 +187,15 @@ def update_latest(tx, ta, bbox):
         rio2wpi_tx(tx)
         rio2wpi_ta(ta)
         rio2wpi_bbox(bbox)
+
+        # Estimate distance from bbox height (tune PIECE_REAL_HEIGHT_M and FOCAL_PX for your setup)
+        PIECE_REAL_HEIGHT_M = 0.30  # approximate game piece height in meters — tune this!
+        x1, y1, x2, y2 = bbox
+        bbox_height_px = max(1, y2 - y1)
+        # focal length in pixels estimated from HFOV and frame height
+        # using same focal_px as infer_one_frame but for vertical axis
+        distance = (PIECE_REAL_HEIGHT_M * 480) / bbox_height_px  # assumes 480px frame height
+        rio2wpi_distance(distance)
 
 
 def publish_stale_if_needed():

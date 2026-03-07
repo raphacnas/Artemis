@@ -46,7 +46,16 @@ public class DriveModePublisher {
     aimLime2PlusPub.set(mode);
   }
 
+  private final IntegerPublisher alignPiecePub =
+      NetworkTableInstance.getDefault()
+          .getIntegerTopic("/Modes/AlignPiece")
+          .publish();
+
   public void publishShooterLime2Plus(int mode) {
     shooterLime2PlusPub.set(mode);
+  }
+
+  public void publishAlignPiece(int mode) {
+    alignPiecePub.set(mode);
   }
 }

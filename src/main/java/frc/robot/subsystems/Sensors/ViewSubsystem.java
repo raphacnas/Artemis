@@ -166,15 +166,30 @@ public void selectAllTowerTags() {
       alliance.get()));
 }
 
-public void selectTagOutpost()
-{
-  var alliance = DriverStation.getAlliance();
-  if(alliance.isEmpty()) return;
+  public void selectTagOutpost()
+  {
+    var alliance = DriverStation.getAlliance();
+    if(alliance.isEmpty()) return;
 
-  allowedBackTags = new java.util.HashSet<>();
-  allowedBackTags.addAll(OutPostSelector.getTags(
-      OutPost.CENTER,
-      alliance.get()));
-}
+    allowedBackTags = new java.util.HashSet<>();
+    allowedBackTags.addAll(OutPostSelector.getTags(
+        OutPost.CENTER,
+        alliance.get()));
+  }
+
+  // ===================== AI PIECE DETECTION (limelight-back) =====================
+
+  public boolean hasAiTarget() {
+    return limeBack.getEntry("has_target").getBoolean(false);
+  }
+
+  public double getAiTxRad() {
+    return Units.degreesToRadians(
+        limeBack.getEntry("piece_tx").getDouble(0.0));
+  }
+
+  public double getAiDistance() {
+    return limeBack.getEntry("piece_distance").getDouble(Double.MAX_VALUE);
+  }
 
 }

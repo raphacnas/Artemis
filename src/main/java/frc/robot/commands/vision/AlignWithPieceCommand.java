@@ -21,9 +21,16 @@ public class AlignWithPieceCommand extends Command {
     addRequirements(swerve);
   }
 
+  private boolean active = false;
+
+  public boolean isActive() {
+    return active;
+  }
+
   @Override
   public void initialize() {
     swerve.getHeadingPID().reset(0);
+    active = true;
   }
 
   @Override
@@ -60,6 +67,7 @@ public class AlignWithPieceCommand extends Command {
 
   @Override
   public void end(boolean interrupted) {
+    active = false;
     swerve.stop();
   }
 }
