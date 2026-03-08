@@ -111,7 +111,6 @@ def read_value(table, key):
     if key not in keys:
         return None
 
-    # tenta ler como número
     val = table.getValue(key, None)
     return val
 
@@ -168,7 +167,8 @@ async def nt_monitor():
                     for ws in clients:
                         try:
                             await ws.send(message)
-                        except:
+                        except Exception as e:
+                            print(f"⚠️ Erro ao enviar para cliente: {type(e).__name__}: {e}")
                             dead.append(ws)
 
                     for ws in dead:
@@ -180,7 +180,11 @@ async def nt_monitor():
 # WEBSOCKET
 # =========================
 
-async def handle_ws(ws):
+# FIX: path=None aceita o path "/nt/dashboard" que o cliente JS envia.
+# Sem isso, versões antigas do websockets passam o path como segundo argumento
+# posicional e o handler lança TypeError silencioso — causando o loop de
+# conectar/desconectar imediatamente.
+async def handle_ws(ws, path=None):
     clients.add(ws)
     print(f"✅ WS conectado ({len(clients)})")
 
@@ -201,8 +205,8 @@ async def handle_ws(ws):
             elif action == "put":
                 write_value(table, key, value)
 
-    except:
-        pass
+    except Exception as e:
+        print(f"⚠️ WS handler erro: {type(e).__name__}: {e}")
     finally:
         clients.discard(ws)
         print(f"❌ WS desconectado ({len(clients)})")
@@ -221,7 +225,9 @@ async def main_async(server_ip: str, port: int):
         handle_ws,
         "0.0.0.0",
         port,
-        max_size=None
+        max_size=None,
+        ping_interval=20,
+        ping_timeout=30,
     ):
         print(f"🚀 WebSocket em ws://0.0.0.0:{port}")
         await asyncio.Future()

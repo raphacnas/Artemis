@@ -74,7 +74,7 @@ function extractTempFromHw(hwArr) {
 // ==========================
 // WEBSOCKET
 // ==========================
-const WS_URL = "ws://127.0.0.1:5810/nt/dashboard";
+const WS_URL = "ws://127.0.0.1:5900/nt/dashboard";
 
 function startWS() {
   let ws;

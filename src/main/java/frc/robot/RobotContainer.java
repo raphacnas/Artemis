@@ -13,7 +13,6 @@ import frc.robot.Dashboards.Drive.DriveModePublisher;
 import frc.robot.Dashboards.RobotStress.DashboardPublisherStress;
 import frc.robot.Dashboards.RobotStress.RobotStressController;
 import frc.robot.Dashboards.RobotStress.RobotStressMonitor;
-import frc.robot.commands.auto_blocks.NamedCommandsRegistry;
 import frc.robot.commands.teleopDrive.DriveCommand;
 import frc.robot.commands.vision.AimLockCommand;
 import frc.robot.commands.vision.AlignWithPieceCommand;
@@ -82,7 +81,7 @@ public class RobotContainer {
     spindexerSubsystem  = new SpindexerSubsystem();
     preShooterSubsystem = new PreShooterSubsystem();
 
-    shooterManager   = new ShooterManager(shooterSubsystem, vision);
+    shooterManager   = new ShooterManager(shooterSubsystem);
     rollerManager    = new IntakeRollerManager(rollerSubsystem);
     spindexerManager = new SpindexerManager(spindexerSubsystem);
     preShooterManager = new PreShooterManager(preShooterSubsystem, vision, shooterManager);
@@ -96,16 +95,6 @@ public class RobotContainer {
     aimLockFront   = new AimLockCommand(drivebase, vision, AimLockCommand.CameraSide.FRONT, xSupplier, ySupplier);
     aimLockBack    = new AimLockCommand(drivebase, vision, AimLockCommand.CameraSide.BACK,  xSupplier, ySupplier);
     alignWithPiece = new AlignWithPieceCommand(drivebase, vision);
-
-    // ← REGISTRO ANTES DO configureBindings e ANTES do PathPlannerAuto
-    NamedCommandsRegistry.registerAll(
-        drivebase,
-        vision,
-        shooterManager,
-        preShooterManager,
-        spindexerManager,
-        climberManager
-    );
 
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -150,6 +139,7 @@ public class RobotContainer {
 
     logitech.povLeft().onTrue(new InstantCommand(() -> spindexerManager.toggleSpin(),       spindexerManager));
     logitech.povDown().onTrue(new InstantCommand(() -> preShooterManager.toggleManualFeed(), preShooterManager));
+    logitech.povRight().onTrue(new InstantCommand(() -> preShooterManager.toggleReverseFeed(), preShooterManager));
     logitech.povUp().onTrue(new InstantCommand(  () -> shooterManager.toggleShooter(),       shooterManager));
 
     logitech.button(4)
@@ -163,19 +153,15 @@ public class RobotContainer {
         .onFalse(new InstantCommand(() -> climberManager.setStopManualClimb()));
   }
 
-  // lazy — só instancia quando o auto realmente começa
   public Command getAutonomousCommand() {
     return Commands.sequence(
-
+        Commands.runOnce(() -> shooterManager.start()),
         new PathPlannerAuto("AutoRobotRight"),
-
-        Commands.runOnce(() -> shooterManager.enableAutoFixed(5000)),
-        Commands.waitSeconds(1),
         Commands.runOnce(() -> preShooterManager.enableAuto()),
-        Commands.waitSeconds(0.1),
+        Commands.waitSeconds(0.01),
         Commands.runOnce(() -> spindexerManager.start()),
         Commands.waitSeconds(3.0),
-        Commands.runOnce(() -> shooterManager.disable()),
+        Commands.runOnce(() -> shooterManager.stop()),
         Commands.runOnce(() -> preShooterManager.stop()),
         Commands.runOnce(() -> spindexerManager.stop())
     );
@@ -192,8 +178,8 @@ public class RobotContainer {
 
     modePublisher.publishAim(aimLockBack.isActive() ? 1 : 0);
     modePublisher.publishAlign(
-        preShooterManager.getMode() == PreShooterManager.ControlMode.AUTO_DISTANCE ? 1 : 0);
-    modePublisher.publishShooterLime2Plus(shooterManager.isEnabled() ? 1 : 0);
+    preShooterManager.getMode() == PreShooterManager.ControlMode.AUTO_DISTANCE ? 1 : 0);
+    modePublisher.publishShooterLime2Plus(shooterManager.isSpinning() ? 1 : 0);
     modePublisher.publishAimLime4(aimLockFront.isActive() ? 1 : 0);
     modePublisher.publishAlignPiece(alignWithPiece.isActive() ? 1 : 0);
   }

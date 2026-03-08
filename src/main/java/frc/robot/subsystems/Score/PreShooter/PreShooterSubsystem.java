@@ -32,6 +32,10 @@ public class PreShooterSubsystem extends SubsystemBase {
         redlineMotor.set(Constants.PreShooterConstants.FEED_POWER);
     }
 
+    public void reverseFeed() {
+    redlineMotor.set(-Constants.PreShooterConstants.FEED_POWER);
+}
+
     public void stop() {
         redlineMotor.stopMotor();
     }

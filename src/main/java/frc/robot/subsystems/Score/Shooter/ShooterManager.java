@@ -1,119 +1,83 @@
 package frc.robot.subsystems.Score.Shooter;
 
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.Sensors.ViewSubsystem;
 
 public class ShooterManager extends SubsystemBase {
 
     public enum ShooterState {
         IDLE,
         SPINNING,
-        AT_SPEED,
         DISABLED
     }
 
+    private final ShooterSubsystem shooter;
     private ShooterState state = ShooterState.IDLE;
 
-    private final ShooterSubsystem shooter;
-    private final ViewSubsystem vision;
-
-    private double lastValidDistance = 0.0;
-
-    private boolean fixedRPMMode = false;
-    private double fixedRPM = 0.0;
-
-    // Tabela de interpolação da WPILib
-    private final InterpolatingDoubleTreeMap rpmTable = new InterpolatingDoubleTreeMap();
-
-    public ShooterManager(ShooterSubsystem shooter, ViewSubsystem vision) {
+    public ShooterManager(ShooterSubsystem shooter) {
         this.shooter = shooter;
-        this.vision = vision;
-
-        // Configuração da tabela: (Distância, RPM)
-        // O próprio mapa cuida da interpolação linear e dos limites (clamping)
-        rpmTable.put(1.0, 5000.0);
-        rpmTable.put(2.0, 5000.0);
-        rpmTable.put(2.5, 5000.0);
-        rpmTable.put(3.0, 5000.0);
-        rpmTable.put(3.5, 5000.0);
-        rpmTable.put(4.0, 5000.0);
+        SmartDashboard.putString("Shooter/State", state.name());
     }
 
-    // ================= TELEOP =================
+    // ================= CONTROLE =================
 
     public void toggleShooter() {
-        if (state == ShooterState.IDLE) {
-            state = ShooterState.SPINNING;
+        if (state == ShooterState.SPINNING) {
+            setState(ShooterState.IDLE);
         } else {
-            state = ShooterState.IDLE;
+            setState(ShooterState.SPINNING);
         }
     }
 
-    // ================= AUTO =================
-
-    public void enable() {
+    public void start() {
         if (state != ShooterState.DISABLED) {
-            state = ShooterState.SPINNING;
+            setState(ShooterState.SPINNING);
         }
     }
 
-    public void disable() {
-        state = ShooterState.IDLE;
+    public void stop() {
+        setState(ShooterState.IDLE);
     }
 
-    public boolean isEnabled() {
-        return state == ShooterState.SPINNING || state == ShooterState.AT_SPEED;
+    public void disable(String reason) {
+        setState(ShooterState.DISABLED);
+        SmartDashboard.putString("Shooter/DisabledReason", reason);
     }
 
-    public boolean isAtSpeed() {
-        return state == ShooterState.AT_SPEED;
+    public void reenable() {
+        if (state == ShooterState.DISABLED) {
+            setState(ShooterState.IDLE);
+        }
+    }
+
+    private void setState(ShooterState newState) {
+        state = newState;
+        SmartDashboard.putString("Shooter/State", state.name());
+    }
+
+    // ================= GETTERS =================
+
+    public boolean isSpinning() {
+        return state == ShooterState.SPINNING;
     }
 
     public ShooterState getState() {
         return state;
     }
 
-
-    public void enableAutoFixed(double rpm) {
-    fixedRPMMode = true;
-    fixedRPM = rpm;
-    if (state != ShooterState.DISABLED) {
-        state = ShooterState.SPINNING;
-    }
-}
-
-public void stop() {
-    state = ShooterState.IDLE;
-    fixedRPMMode = false;
-}
+    // ================= PERIODIC =================
 
     @Override
     public void periodic() {
-        
-        // System.out.println("Distance: " + vision.getBackDistanceToTag());
-
-        if (state == ShooterState.IDLE || state == ShooterState.DISABLED) {
-            shooter.stop();
-            return;
-        }
-
-        double distance = vision.getBackDistanceToTag();
-
-        if (distance != Double.MAX_VALUE) {
-            lastValidDistance = distance;
-        }
-
-        // Obtém o RPM interpolado automaticamente
-        double rpm = fixedRPMMode ? fixedRPM : rpmTable.get(lastValidDistance);
-
-        shooter.setTargetRPM(rpm);
-
-        // Atualização de estado baseada no feedback do motor
-        if (shooter.isAtSpeed()) {
-            state = ShooterState.AT_SPEED;
-        } else {
-            state = ShooterState.SPINNING;
+        switch (state) {
+            case SPINNING:
+                shooter.setpower();
+                break;
+            case DISABLED:
+            case IDLE:
+            default:
+                shooter.stop();
+                break;
         }
     }
 }

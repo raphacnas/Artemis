@@ -17,7 +17,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
 
         SparkMaxConfig config = new SparkMaxConfig();
         config
-            .idleMode(IdleMode.kBrake)
+            .idleMode(IdleMode.kCoast)
             .smartCurrentLimit(40);
 
         leader.configure(

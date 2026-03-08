@@ -9,7 +9,7 @@ def run_horizontal():
 
 def run_ws():
     import asyncio
-    asyncio.run(bridge.nt3_ws.main_async("10.91.63.2", 5810))
+    asyncio.run(bridge.nt3_ws.main_async("10.91.63.2", 5900))
 
 if __name__ == "__main__":
     t1 = threading.Thread(target=run_horizontal, daemon=True)
