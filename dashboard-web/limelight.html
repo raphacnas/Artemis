@@ -20,19 +20,16 @@
       <div class="limelight-row" id="lime4">
 
         <div class="camera-box arrow-parent">
-          <!-- Lime 4: apenas exibição do stream -->
           <img
             src="http://10.91.63.30:5800/stream.mjpg"
             alt="Lime 4 Stream"
             style="width:100%; height:100%; object-fit:cover;"
           >
-          <!-- NÃO TEM SETA / BBOX AQUI (sem IA) -->
         </div>
 
         <div class="info-box">
           <div class="info-title">Lime 4</div>
 
-          <!-- YAW -->
           <div class="offset-container" id="yaw-lime4">
             <div class="offset-line">
               <span class="offset-label">Trava de Mira:</span>
@@ -43,7 +40,6 @@
               <span data-mode="1">TAG</span>
             </div>
           </div>
-
 
           <div class="info-footer">
             <span id="temp-lime4" class="ll-temp">Temp: --°C</span>
@@ -68,7 +64,6 @@
         <div class="info-box">
           <div class="info-title">Lime 2+</div>
 
-          <!-- AIMLOCK -->
           <div class="offset-container" id="yaw-lime2plus">
             <div class="offset-line">
               <span class="offset-label">Trava de Mira:</span>
@@ -80,7 +75,6 @@
             </div>
           </div>
 
-          <!-- SHOOTER -->
           <div class="offset-container" id="shooter-lime2plus">
             <div class="offset-line">
               <span class="offset-label">Shooter:</span>
@@ -105,21 +99,17 @@
       <div class="limelight-row" id="lime2">
 
         <div class="camera-box arrow-parent">
-          <!-- Lime 2+: exibe stream e recebe seta/bbox via JS -->
           <img
             src="http://10.91.63.2:1181/?action=stream"
             alt="Fisheye Stream"
-            style="width:100%; height:100%; object-fit:cover;"
+            style="width:100%; height:100%; object-fit:cover; transform: rotate(180deg);"
           >
-          <!-- SETA (IA SOMENTE AQUI) -->
           <div class="arrow hidden" id="arrow-lime2"></div>
-          <!-- bbox será criado via JS e anexado no parent -->
         </div>
 
         <div class="info-box">
           <div class="info-title">Fisheye</div>
 
-          <!-- YAW -->
           <div class="offset-container" id="yaw-lime2">
             <div class="offset-line">
               <span class="offset-label">Trava de Mira:</span>
@@ -130,10 +120,6 @@
               <span data-mode="1">BALL</span>
             </div>
           </div>
-
-         <!-- <div class="info-footer">
-            <span id="temp-lime2" class="ll-temp">Temp: --°C</span>
-          </div> -->
 
         </div>
       </div>

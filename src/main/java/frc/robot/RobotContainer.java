@@ -127,7 +127,7 @@ public class RobotContainer {
     logitech.button(5).onTrue(new InstantCommand(() -> rollerManager.toggleIntake(),   rollerManager));
     logitech.button(6).onTrue(new InstantCommand(() -> rollerManager.toggleOuttake(),  rollerManager));
 
-    new Trigger(() -> logitech.getRawAxis(2) > 0.04)
+    new Trigger(() -> logitech.getRawAxis(2) > 0.0)
         .onTrue(new InstantCommand(() -> intake.setManual(), intake))
         .whileTrue(new RunCommand(() -> intake.setManualOutput(0.3), intake))
         .onFalse(new InstantCommand(() -> intake.stop(), intake));
@@ -158,7 +158,6 @@ public class RobotContainer {
         Commands.runOnce(() -> shooterManager.start()),
         new PathPlannerAuto("AutoRobotRight"),
         Commands.runOnce(() -> preShooterManager.enableAuto()),
-        Commands.waitSeconds(0.01),
         Commands.runOnce(() -> spindexerManager.start()),
         Commands.waitSeconds(3.0),
         Commands.runOnce(() -> shooterManager.stop()),

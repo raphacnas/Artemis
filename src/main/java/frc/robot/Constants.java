@@ -99,8 +99,8 @@ public final class Constants {
     public static final double CLIMBER_kI = 0.0;
     public static final double CLIMBER_kD = 0.0;
 
-    public static final double CLIMBER_MAX_OUTPUT = 0.25;
-    public static final double CLIMBER_MIN_OUTPUT = -0.25;
+    public static final double CLIMBER_MAX_OUTPUT = 0.9;
+    public static final double CLIMBER_MIN_OUTPUT = -0.9;
     
     public static final int CLIMBER_LEFT_ID = 14;
     public static final int CLIMBER_RIGHT_ID = 15;
