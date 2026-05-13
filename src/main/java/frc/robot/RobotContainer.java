@@ -2,6 +2,8 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -64,6 +66,8 @@ public class RobotContainer {
   private final DashboardPublisherStress stressPublisher;
   private final DriveModePublisher modePublisher;
 
+  private final SendableChooser<String> autoChooser;
+
   public RobotContainer() {
 
     controller = new CommandPS5Controller(Constants.PS5_ID);
@@ -91,6 +95,14 @@ public class RobotContainer {
     stressPublisher  = new DashboardPublisherStress();
     modePublisher    = new DriveModePublisher();
 
+    // Build auto chooser — commands are built lazily when auto starts,
+    // not at robot init, to avoid blocking the loop on PathPlanner file loading
+    autoChooser = new SendableChooser<>();
+    autoChooser.setDefaultOption("AutoRobotRight", "AutoRobotRight");
+    autoChooser.addOption("AutoTaxiHUB",           "AutoTaxiHUB");
+    autoChooser.addOption("Do Nothing",            "");
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+
     aimLockFront   = new AimLockCommand(drivebase, vision, AimLockCommand.CameraSide.FRONT, xSupplier, ySupplier);
     aimLockBack    = new AimLockCommand(drivebase, vision, AimLockCommand.CameraSide.BACK,  xSupplier, ySupplier);
     alignWithPiece = new AlignWithPieceCommand(drivebase, vision);
@@ -112,42 +124,62 @@ public class RobotContainer {
 
     // --- Main controller (PS5) ---
 
-    controller.L1().onTrue(new InstantCommand(() -> rollerManager.toggleIntake(),  rollerManager));
-    controller.R1().onTrue(new InstantCommand(() -> rollerManager.toggleOuttake(), rollerManager));
+    controller.L1().onTrue(new InstantCommand(() -> intake.setManualOutput(0.3),  intake))
+                   .onFalse(new InstantCommand(() -> intake.stop(), intake));
+
+    controller.R1().onTrue(new InstantCommand(() -> intake.setManualOutput(-0.3), intake))
+                   .onFalse(new InstantCommand(() -> intake.stop(), intake));
 
     // Intake angle - L2/R2 on main controller (no conflict now)
-    new Trigger(() -> controller.getL2Axis() > 0.04)
-        .onTrue(new InstantCommand(() -> intake.setManual(), intake))
-        .whileTrue(new RunCommand(() -> intake.setManualOutput(0.3), intake))
-        .onFalse(new InstantCommand(() -> intake.stop(), intake));
+    // new Trigger(() -> controller.getL2Axis() > 0.04)
+    //     .onTrue(new InstantCommand(() -> intake.setManual(), intake))
+    //     .whileTrue(new RunCommand(() -> intake.setManualOutput(0.3), intake))
+    //     .onFalse(new InstantCommand(() -> intake.stop(), intake));
 
-    new Trigger(() -> controller.getR2Axis() > 0.04)
-        .onTrue(new InstantCommand(() -> intake.setManual(), intake))
-        .whileTrue(new RunCommand(() -> intake.setManualOutput(-0.3), intake))
-        .onFalse(new InstantCommand(() -> intake.stop(), intake));
+    // new Trigger(() -> controller.getR2Axis() > 0.04)
+    //     .onTrue(new InstantCommand(() -> intake.setManual(), intake))
+    //     .whileTrue(new RunCommand(() -> intake.setManualOutput(-0.3), intake))
+    //     .onFalse(new InstantCommand(() -> intake.stop(), intake));
 
-    controller.povLeft().onTrue(new InstantCommand(() -> spindexerManager.toggleSpin(),          spindexerManager));
-    controller.povDown().onTrue(new InstantCommand(() -> preShooterManager.toggleManualFeed(),    preShooterManager));
+    controller.povUp().onTrue(new InstantCommand(() -> spindexerManager.toggleSpin(),          spindexerManager));
+    controller.povUp().onTrue(new InstantCommand(() -> preShooterManager.toggleManualFeed(),    preShooterManager));
     controller.povRight().onTrue(new InstantCommand(() -> preShooterManager.toggleReverseFeed(),  preShooterManager));
     controller.povUp().onTrue(new InstantCommand(  () -> shooterManager.toggleShooter(),          shooterManager));
 
     // --- Logitech controller - Climber (no axis conflict) ---
 
-    new Trigger(() -> logitech.getR2Axis() > 0.04)
+    controller.R2()
         .onTrue(new InstantCommand(() -> climberManager.setManual(), climberManager))
         .whileTrue(new RunCommand(() -> climberManager.setClimbManual(-0.3), climberManager))
         .onFalse(new InstantCommand(() -> climberManager.setStopManualClimb()));
 
-    new Trigger(() -> logitech.getL2Axis() > 0.04)
+    controller.L2() 
         .onTrue(new InstantCommand(() -> climberManager.setManual(), climberManager))
         .whileTrue(new RunCommand(() -> climberManager.setClimbManual(0.3), climberManager))
         .onFalse(new InstantCommand(() -> climberManager.setStopManualClimb()));
+
+    // --- Vision commands ---
+    // Triangle: aim lock front camera (tower alignment)
+    controller.triangle().whileTrue(aimLockFront);
+
+    // Cross: aim lock back camera (hub alignment)
+    controller.cross().whileTrue(aimLockBack);
+
+    // Square: align with game piece using AI pipeline
+    controller.square().whileTrue(alignWithPiece);
   }
 
   public Command getAutonomousCommand() {
+    String selected = autoChooser.getSelected();
+    if (selected == null || selected.isEmpty()) return Commands.none();
+    return buildAutoCommand(selected);
+  }
+
+  /** Wraps a PathPlanner auto name with the standard shooter/spindexer sequence. */
+  private Command buildAutoCommand(String autoName) {
     return Commands.sequence(
         Commands.runOnce(() -> shooterManager.start()),
-        new PathPlannerAuto("AutoRobotRight"),
+        new PathPlannerAuto(autoName),
         Commands.runOnce(() -> preShooterManager.enableAuto()),
         Commands.runOnce(() -> spindexerManager.start()),
         Commands.waitSeconds(3.0),

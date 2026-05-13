@@ -99,6 +99,12 @@ TABLES_AND_KEYS = {
 # =========================
 
 def init_nt(server_ip: str):
+    # CORRECAO: so inicializa se ainda nao estiver conectado,
+    # evitando conflito com a inicializacao do AI_Data.py
+    if NetworkTables.isConnected():
+        print(f"🔗 NT3 -> {server_ip} (ja conectado, reaproveitando)")
+        return
+
     NetworkTables.initialize(server=server_ip)
     print(f"🔗 NT3 -> {server_ip} (aguardando...)")
 
@@ -117,8 +123,12 @@ def read_value(table, key):
 
 def ensure_entry_exists(table, key):
     if key not in table.getKeys():
-        table.putNumber(key, 0.0)
-
+        if key in ("bbox", "hw"):
+            table.putNumberArray(key, [0.0, 0.0, 0.0, 0.0])
+        elif key == "has_target":
+            table.putBoolean(key, False)
+        else:
+            table.putNumber(key, 0.0)
 
 def write_value(table, key, value):
     if isinstance(value, bool):
@@ -180,10 +190,6 @@ async def nt_monitor():
 # WEBSOCKET
 # =========================
 
-# FIX: path=None aceita o path "/nt/dashboard" que o cliente JS envia.
-# Sem isso, versões antigas do websockets passam o path como segundo argumento
-# posicional e o handler lança TypeError silencioso — causando o loop de
-# conectar/desconectar imediatamente.
 async def handle_ws(ws, path=None):
     clients.add(ws)
     print(f"✅ WS conectado ({len(clients)})")

@@ -13,7 +13,7 @@ def run_limelight():
 
 def run_ws():
     try:
-        asyncio.run(bridge.nt3_ws.main_async("10.91.63.2", 5900))
+        asyncio.run(bridge.nt3_ws.main_async("10.91.63.2", 5901))
     except Exception as e:
         print(f"❌ WS erro: {e}")
 

@@ -4,6 +4,11 @@
   <meta charset="UTF-8" />
   <title>HYDRA Limelight Dashboard</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Teko:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <link rel="icon" href="data:,">
+
   <!-- CSS -->
   <link rel="stylesheet" href="./css/global.css" />
   <link rel="stylesheet" href="./css/limelight/limelight_box.css" />
@@ -32,8 +37,8 @@
 
           <div class="offset-container" id="yaw-lime4">
             <div class="offset-line">
-              <span class="offset-label">Trava de Mira:</span>
               <div class="offset-box"></div>
+              <span class="offset-label">Trava de Mira:</span>
             </div>
             <div class="offset-modes">
               <span data-mode="0">OFF</span> |
@@ -55,7 +60,7 @@
 
         <div class="camera-box arrow-parent">
           <img
-            src="http://10.91.63.200:5800"
+            src="http://10.91.63.20:5800"
             alt="Lime 2+ Stream"
             style="width:100%; height:100%; object-fit:cover;"
           >
@@ -66,8 +71,8 @@
 
           <div class="offset-container" id="yaw-lime2plus">
             <div class="offset-line">
-              <span class="offset-label">Trava de Mira:</span>
               <div class="offset-box"></div>
+              <span class="offset-label">Trava de Mira:</span>
             </div>
             <div class="offset-modes">
               <span data-mode="0">OFF</span> |
@@ -77,8 +82,8 @@
 
           <div class="offset-container" id="shooter-lime2plus">
             <div class="offset-line">
-              <span class="offset-label">Shooter:</span>
               <div class="offset-box"></div>
+              <span class="offset-label">Shooter:</span>
             </div>
             <div class="offset-modes">
               <span data-mode="0">OFF</span> |
@@ -112,12 +117,23 @@
 
           <div class="offset-container" id="yaw-lime2">
             <div class="offset-line">
-              <span class="offset-label">Trava de Mira:</span>
               <div class="offset-box"></div>
+              <span class="offset-label">Trava de Mira:</span>
             </div>
             <div class="offset-modes">
               <span data-mode="0">OFF</span> |
-              <span data-mode="1">BALL</span>
+              <span data-mode="1">ON</span>
+            </div>
+          </div>
+
+          <div class="offset-container" id="align-piece">
+            <div class="offset-line">
+              <div class="offset-box"></div>
+              <span class="offset-label">Intake:</span>
+            </div>
+            <div class="offset-modes">
+              <span data-mode="0">OFF</span> |
+              <span data-mode="1">ON</span>
             </div>
           </div>
 
@@ -127,15 +143,8 @@
     </div>
   </div>
 
-  <!-- JS -->
-  <!-- ws.js must be loaded first so the shared socket is ready before
-       arrow_nt.js and modes.js register their onNTMessage handlers. -->
   <script type="module" src="./js/ws.js"></script>
   <script type="module" src="./js/limelight/arrow_nt.js"></script>
-  <!-- Changed from plain <script> to type="module" so that modes.js can
-       use ES module imports (import { onNTMessage } from "../ws.js").
-       Previously this was a plain script, which silently broke the import
-       and caused modes.js to open its own duplicate WebSocket connection. -->
   <script type="module" src="./js/limelight/modes.js"></script>
 
 </body>

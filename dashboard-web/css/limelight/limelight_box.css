@@ -1,13 +1,24 @@
+:root {
+  --bg:      #05080a;
+  --panel:   #0a0e12;
+  --border:  #172028;
+  --accent:  #99f0f0;
+  --ok:      #00e676;
+  --warn:    #ffb300;
+  --danger:  #ff3d3d;
+  --dim:     #2e4050;
+  --text:    #b8cdd8;
+  --mono:    'Share Tech Mono', monospace;
+  --display: 'Teko', sans-serif;
+}
 /* ============================= */
 /* RESET GLOBAL */
 /* ============================= */
-
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
-
 html, body {
   width: 100%;
   height: 100%;
@@ -15,157 +26,129 @@ html, body {
   padding: 0;
   overflow-x: hidden;
   overflow-y: hidden;
-  background-color: #000000;
-  color: #ffffff;
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--display);
 }
-
 /* ============================= */
 /* LIMELIGHT DASHBOARD */
 /* ============================= */
-
 #dashboard-root {
   display: grid;
   grid-template-columns: 1fr;
-
   width: 100%;
   min-height: 100vh;
-
-  place-content: center; 
+  place-content: center;
 }
-
-
 .limelight-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 10px;
   margin-top: 5px;
   justify-items: center;
-  
 }
-
 /* ============================= */
 /* LINHA CAMERA + INFO */
 /* ============================= */
-
 .limelight-row {
   display: flex;
-  align-items: center; 
+  align-items: center;
   width: 97.5%;
 }
-
 /* ============================= */
 /* CAMERA */
 /* ============================= */
-
 .camera-box {
-  flex: 0 0 75%;       
+  flex: 0 0 75%;
   height: 335px;
-
   overflow: hidden;
   background: #000;
-  border: 2px solid #8C7A69;
+  border: 2px solid #afaead;
   border-radius: 12px;
-
   position: relative;
 }
-
 /* ============================= */
 /* INFO BOX */
 /* ============================= */
-
 .info-box {
-  flex: 0 0 25%;        
-  height: 300px;        
-
-  background: #0f0f0e;
-  border: 2px solid #8C7A69;
+  flex: 0 0 25%;
+  height: 300px;
+  background: var(--panel);
+  border: 2px solid #afaead;
   border-left: none;
   border-radius: 0 12px 12px 0;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-
-  margin-left: -2px;    
+  margin-left: -2px;
   padding-top: 12px;
 }
-
 /* ============================= */
 /* TITULO */
 /* ============================= */
-
 .info-title {
   font-size: 1.2rem;
-  color: #fff;
+  color: var(--accent);
   margin-bottom: 18px;
   text-align: center;
+  letter-spacing: 0.1em;
 }
-
 /* ============================= */
 /* BLOCO DE MODOS */
 /* ============================= */
-
 .offset-container {
-  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: center;   /* centraliza tanto a linha quanto o modes */
   margin-bottom: 14px;
 }
-
-/* linha: texto + caixa */
+/* linha: box à esquerda, label à direita */
 .offset-line {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  flex-direction: row-reverse;
+  flex-direction: row;
   gap: 10px;
-
-  width: 85%;
 }
-
 /* texto */
 .offset-label {
   font-size: 0.9rem;
   font-weight: normal;
-  color: #ccc;
+  color: var(--text);
+  white-space: nowrap;
 }
-
-/* caixa branca */
+/* caixa colorida */
 .offset-box {
+  flex-shrink: 0;
   width: 2.4em;
   height: 1.4em;
-  background: #ffffff;
+  background: var(--dim);
   border-radius: 8px;
 }
-
-/* ON | OFF | AUTO */
+/* ON | OFF | AUTO — centralizado em relação ao conjunto box+label */
 .offset-modes {
   margin-top: 6px;
+  font-family: var(--mono);
   font-size: 0.75rem;
   font-weight: normal;
-  color: #888;
+  color: var(--dim);
+  text-align: center;
 }
-
 /* ============================= */
 /* TEMP LIMELIGHT */
 /* ============================= */
-
 .info-footer {
   margin-top: auto;
   width: 85%;
   padding: 8px 0 10px 0;
   text-align: left;
 }
-
 .ll-temp {
+  font-family: var(--mono);
   font-size: 0.75rem;
-  color: #bbb;
+  color: var(--dim);
 }
-
 .ll-temp.warn {
-  color: #ffaa00;
+  color: var(--warn);
   font-weight: bold;
 }

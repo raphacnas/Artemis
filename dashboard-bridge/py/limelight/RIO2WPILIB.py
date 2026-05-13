@@ -110,8 +110,8 @@ def rio2wpi_bbox(bbox: List[float]):
     bbox esperado: [x1, y1, x2, y2]
     """
     _ensure()
-    if bbox is None or len(bbox) != 4:
-        return
+    # if bbox is None or len(bbox) != 4:
+    #     return
     _table.putNumberArray(KEY_BBOX, [float(v) for v in bbox])
 
 

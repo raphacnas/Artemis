@@ -1,8 +1,5 @@
 "use strict";
 
-// modes.js now uses the shared WebSocket from ws.js instead of opening
-// its own connection, which previously caused two simultaneous WS connections
-// on the limelight page and potential race conditions on reconnect.
 import { onNTMessage } from "../ws.js";
 
 // ==========================
@@ -60,7 +57,8 @@ function setTemp(elementId, tempC) {
   const el = document.getElementById(elementId);
   if (!el) return;
   const t = Number(tempC);
-  if (!Number.isFinite(t)) {
+  // considera inválido: NaN, null, undefined, ou 0 exato (NT não conectado)
+  if (!Number.isFinite(t) || t === 0) {
     el.textContent = "Temp: --°C";
     el.classList.remove("warn");
     return;
@@ -70,18 +68,28 @@ function setTemp(elementId, tempC) {
   el.classList.toggle("warn", warn);
 }
 
-function extractTempFromHw(hwArr) {
-  if (!Array.isArray(hwArr)) return null;
-  const temp = Number(hwArr[0]);
-  return Number.isFinite(temp) ? temp : null;
+function extractTempFromHw(hw) {
+  // hw pode chegar como array [temp, ...] ou como número direto
+  if (Array.isArray(hw)) {
+    const temp = Number(hw[0]);
+    return Number.isFinite(temp) ? temp : null;
+  }
+  if (typeof hw === "number" || typeof hw === "string") {
+    const temp = Number(hw);
+    return Number.isFinite(temp) ? temp : null;
+  }
+  return null;
 }
 
 // ==========================
 // NT MESSAGE HANDLER
-// (shared connection via ws.js)
 // ==========================
 onNTMessage((topic, value) => {
   if (value === null || value === undefined) return;
+  
+  if (topic.includes("limelight") || topic.includes("Modes")) {
+    console.log(`[NT] ${topic} =`, value);
+  }
 
   switch (topic) {
     case TOPIC_AIMLOCK_LIME4:

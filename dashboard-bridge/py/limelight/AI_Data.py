@@ -4,7 +4,6 @@ import cv2
 import math
 from ultralytics import YOLO
 
-# IMPORTA FUNCOES DO SEU RIO2WPILIB
 from limelight.RIO2WPILIB import (
     init_nt,
     rio2wpi_tx,
@@ -29,7 +28,6 @@ STALE_TIMEOUT_S = 2.0
 REOPEN_COOLDOWN_S = 0.5
 FAILS_BEFORE_REOPEN = 8
 
-# HFOV padrao Limelight
 LIMELIGHT_HFOV_DEG = 59.6
 
 running = True
@@ -45,11 +43,6 @@ latest_frame = None
 
 cap_status = {"opened": False, "fails": 0, "reopens": 0, "last_ok": 0.0}
 last_infer = 0.0
-
-# =========================
-# NETWORKTABLES
-# =========================
-init_nt(server="10.91.63.2", table_name="limelight-back")
 
 # =========================
 # CAPTURE
@@ -114,8 +107,9 @@ def capture_worker():
     if cap:
         cap.release()
 
+
 # =========================
-# INFERENCIA (SMART TARGET GROUP)
+# INFERENCIA
 # =========================
 def infer_one_frame(model: YOLO, frame):
     if frame is None:
@@ -152,16 +146,12 @@ def infer_one_frame(model: YOLO, frame):
     if len(centers_x) == 0:
         return None, None, None
 
-    # ===== CENTRO MEDIO DO GRUPO =====
     avg_x = sum(centers_x) / len(centers_x)
-
     dx = avg_x - cx
     tx_deg = math.degrees(math.atan(dx / focal_px))
 
-    # ===== AREA TOTAL DO GRUPO =====
     ta = (sum(areas) / frame_area) * 100.0
 
-    # ===== BBOX VIRTUAL DO GRUPO =====
     x1 = int(min(b[0] for b in boxes))
     y1 = int(min(b[1] for b in boxes))
     x2 = int(max(b[2] for b in boxes))
@@ -188,14 +178,8 @@ def update_latest(tx, ta, bbox, frame_height: int):
         rio2wpi_ta(ta)
         rio2wpi_bbox(bbox)
 
-        # Estimate distance from bbox height using the pinhole model:
-        #   distance = (real_height_m * focal_length_px) / bbox_height_px
-        # focal_length_px is derived from VFOV and the actual frame height,
-        # so this works correctly regardless of capture resolution.
-        # Previously frame height was hardcoded to 480, which gave wrong
-        # distances whenever the camera returned a different resolution.
-        PIECE_REAL_HEIGHT_M = 0.30  # approximate game piece height in meters — tune this!
-        LIMELIGHT_VFOV_DEG  = 49.7  # vertical FOV for Limelight — adjust if needed
+        PIECE_REAL_HEIGHT_M = 0.30
+        LIMELIGHT_VFOV_DEG  = 49.7
 
         x1, y1, x2, y2 = bbox
         bbox_height_px = max(1, y2 - y1)
@@ -217,6 +201,13 @@ def publish_stale_if_needed():
 def main_loop():
     global running, last_infer
 
+    # CORRECAO: init_nt chamado aqui dentro, nao no nivel do modulo.
+    # Isso evita race condition com nt3_ws.py quando ambos sobem juntos
+    # no main.py. O RIO2WPILIB ja protege contra dupla inicializacao
+    # com o flag _initialized, entao so o primeiro a chamar vai de fato
+    # inicializar — o segundo retorna imediatamente sem fazer nada.
+    init_nt(server="10.91.63.2", table_name="limelight-back")
+
     model = YOLO(MODEL_PATH)
     threading.Thread(target=capture_worker, daemon=True).start()
 
@@ -233,11 +224,11 @@ def main_loop():
             if img is not None:
                 last_infer = now
                 tx, ta, bbox = infer_one_frame(model, img)
-                # Pass actual frame height so distance estimate is resolution-independent
                 frame_h = img.shape[0]
                 update_latest(tx, ta, bbox, frame_h)
 
         time.sleep(0.001)
+
 
 # =========================
 # START

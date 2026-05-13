@@ -108,12 +108,14 @@ public class AimLockCommand extends Command {
   }
 
   @Override
-public boolean isFinished() {
-  if (side == CameraSide.FRONT) {
-    return Math.abs(vision.getFrontTxRad()) < Units.degreesToRadians(1.5);
-  } else {
-    return Math.abs(vision.getBackTxRad()) < Units.degreesToRadians(1.5);
+  public boolean isFinished() {
+    if (side == CameraSide.FRONT) {
+      return vision.hasValidFrontTarget()
+          && Math.abs(vision.getFrontTxRad()) < Units.degreesToRadians(1.5);
+    } else {
+      return vision.hasValidBackTarget()
+          && Math.abs(vision.getBackTxRad()) < Units.degreesToRadians(1.5);
+    }
   }
-}
 
 }

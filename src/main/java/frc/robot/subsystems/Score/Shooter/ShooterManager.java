@@ -8,6 +8,7 @@ public class ShooterManager extends SubsystemBase {
     public enum ShooterState {
         IDLE,
         SPINNING,
+        SPINNING_BACK,
         DISABLED
     }
 
@@ -28,6 +29,14 @@ public class ShooterManager extends SubsystemBase {
             setState(ShooterState.SPINNING);
         }
     }
+
+    // public void toggleReverseShooter() {
+    //     if (state == ShooterState.SPINNING_BACK) {
+    //         setState(ShooterState.IDLE);
+    //     } else {
+    //         setState(ShooterState.SPINNING_BACK);
+    //     }
+    // }
 
     public void start() {
         if (state != ShooterState.DISABLED) {
@@ -71,8 +80,11 @@ public class ShooterManager extends SubsystemBase {
     public void periodic() {
         switch (state) {
             case SPINNING:
-                shooter.setpower();
+                shooter.setpower(0.4);
                 break;
+            // case SPINNING_BACK:
+            //     shooter.setpower(-0.6);
+            //     break;
             case DISABLED:
             case IDLE:
             default:

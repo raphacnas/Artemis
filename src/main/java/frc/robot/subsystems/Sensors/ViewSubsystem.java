@@ -23,10 +23,10 @@ public class ViewSubsystem extends SubsystemBase {
   // ================= LIMELIGHTS =================
 
   private final NetworkTable limeFront =
-      NetworkTableInstance.getDefault().getTable("limelight-front");
+      NetworkTableInstance.getDefault().getTable("limelight-front"); // 4
 
   private final NetworkTable limeBack =
-      NetworkTableInstance.getDefault().getTable("limelight-back");
+      NetworkTableInstance.getDefault().getTable("limelight-back"); // 2
 
   // ===================== TAG SELECTION =====================
 
