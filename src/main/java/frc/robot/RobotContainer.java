@@ -14,6 +14,10 @@ import frc.robot.Dashboards.Drive.DriveModePublisher;
 import frc.robot.Dashboards.RobotStress.DashboardPublisherStress;
 import frc.robot.Dashboards.RobotStress.RobotStressController;
 import frc.robot.Dashboards.RobotStress.RobotStressMonitor;
+import frc.robot.adl.ADLExecutor;
+import frc.robot.adl.ADLManager;
+import frc.robot.adl.HumanIntentSource;
+import frc.robot.adl.RobotContextProvider;
 import frc.robot.commands.teleopDrive.DriveCommand;
 import frc.robot.commands.vision.AimLockCommand;
 import frc.robot.commands.vision.AlignWithPieceCommand;
@@ -35,9 +39,11 @@ import java.util.function.DoubleSupplier;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
+@SuppressWarnings("unused")
 public class RobotContainer {
 
   private final CommandPS5Controller controller;
+  @SuppressWarnings("unused")
   private final CommandPS5Controller logitech;
 
   private final DoubleSupplier xSupplier;
@@ -52,6 +58,7 @@ public class RobotContainer {
   private final PreShooterSubsystem preShooterSubsystem;
 
   private final ShooterManager shooterManager;
+  @SuppressWarnings("unused")
   private final IntakeRollerManager rollerManager;
   private final SpindexerManager spindexerManager;
   private final PreShooterManager preShooterManager;
@@ -67,6 +74,8 @@ public class RobotContainer {
   private final DriveModePublisher modePublisher;
 
   private final SendableChooser<String> autoChooser;
+
+  private final ADLManager adlManager;
 
   public RobotContainer() {
 
@@ -109,6 +118,19 @@ public class RobotContainer {
 
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
+
+    adlManager = new ADLManager(
+    new HumanIntentSource(),
+    new RobotContextProvider(),
+    new ADLExecutor(
+        intake,
+        rollerManager,
+        climberManager,
+        preShooterManager,
+        shooterManager,
+        spindexerManager
+    )
+);
   }
 
   private void configureBindings() {
@@ -190,6 +212,9 @@ public class RobotContainer {
   }
 
   public void periodic() {
+
+    adlManager.periodic();
+
     var stressData   = stressMonitor.generateData(drivebase);
     stressController.update(stressData);
 

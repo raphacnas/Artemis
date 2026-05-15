@@ -46,12 +46,19 @@ case CLIMBING:
     shooter.stop();
     climb.goToMax();
     break;
+case ACQUIRING:
+    shooter.stop();
+    preShooter.stop();
+    intakeRoller.toggleIntake();
+    break;
 case EMERGENCY:
     intakeRoller.stop();
     preShooter.stop();
     shooter.stop();
     climb.setStopManualClimb();
     intakeAngle.stop();
+    break;
+default:
     break;
         }
     }

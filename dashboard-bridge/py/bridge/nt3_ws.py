@@ -50,7 +50,8 @@ TABLES_AND_KEYS = {
     ],
 
     "Robot": [
-        "BatteryVoltage"
+        "BatteryVoltage",
+        "SpeedLimited"
     ],
 
     "Shooter": [

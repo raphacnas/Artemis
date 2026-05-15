@@ -93,6 +93,7 @@ public final class Constants {
     public static final double RPM_TOLERANCE = 100;
     
   }
+  
     public static class ClimbConstants {
 
     public static final double CLIMBER_kP = 0.02;
@@ -108,10 +109,10 @@ public final class Constants {
    
     public static final String PREF_MIN_KEY = "Climber min position";
     public static final String PREF_MAX_KEY = "Climber max position";
-}
+  }
 
-public static class ADLManager {
-    public static final double MIN_DECISION_INTERVAL = 0.1; 
-}
+    public static class ADLManager {
+        public static final double MIN_DECISION_INTERVAL = 0.1; 
+  }
 
 }
