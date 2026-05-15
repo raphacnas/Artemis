@@ -128,6 +128,8 @@ def ensure_entry_exists(table, key):
             table.putNumberArray(key, [0.0, 0.0, 0.0, 0.0])
         elif key == "has_target":
             table.putBoolean(key, False)
+        elif key in ("state", "decision", "intent", "stressLevel"):
+            table.putString(key, "")
         else:
             table.putNumber(key, 0.0)
 
