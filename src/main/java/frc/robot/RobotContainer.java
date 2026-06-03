@@ -1,5 +1,10 @@
 package frc.robot;
 
+import java.io.File;
+import java.util.function.DoubleSupplier;
+
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -9,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Dashboards.Drive.DriveModePublisher;
 import frc.robot.Dashboards.RobotStress.DashboardPublisherStress;
 import frc.robot.Dashboards.RobotStress.RobotStressController;
@@ -21,8 +25,8 @@ import frc.robot.adl.RobotContextProvider;
 import frc.robot.commands.teleopDrive.DriveCommand;
 import frc.robot.commands.vision.AimLockCommand;
 import frc.robot.commands.vision.AlignWithPieceCommand;
-import frc.robot.subsystems.Score.Climb.ClimberManager;
 import frc.robot.subsystems.Score.Angular.IntakeAngleManager;
+import frc.robot.subsystems.Score.Climb.ClimberManager;
 import frc.robot.subsystems.Score.PreShooter.PreShooterManager;
 import frc.robot.subsystems.Score.PreShooter.PreShooterSubsystem;
 import frc.robot.subsystems.Score.Rollers.IntakeRollerManager;
@@ -34,16 +38,10 @@ import frc.robot.subsystems.Score.Spindexer.SpindexerSubsystem;
 import frc.robot.subsystems.Sensors.ViewSubsystem;
 import frc.robot.subsystems.Swervedrive.SwerveSubsystem;
 
-import java.io.File;
-import java.util.function.DoubleSupplier;
-
-import com.pathplanner.lib.commands.PathPlannerAuto;
-
 @SuppressWarnings("unused")
 public class RobotContainer {
 
   private final CommandPS5Controller controller;
-  @SuppressWarnings("unused")
   private final CommandPS5Controller logitech;
 
   private final DoubleSupplier xSupplier;
@@ -58,7 +56,6 @@ public class RobotContainer {
   private final PreShooterSubsystem preShooterSubsystem;
 
   private final ShooterManager shooterManager;
-  @SuppressWarnings("unused")
   private final IntakeRollerManager rollerManager;
   private final SpindexerManager spindexerManager;
   private final PreShooterManager preShooterManager;
@@ -212,7 +209,6 @@ public class RobotContainer {
   }
 
 
-  // PUSH
   public void periodic() {
 
     adlManager.periodic();
