@@ -1,99 +1,21 @@
 import asyncio
 import json
+from pathlib import Path
 import time
 import websockets
 from networktables import NetworkTables
 
 clients = set()
 PULSE_TIME = 0.2
+CONFIG_PATH = Path(__file__).resolve().parents[3] / "dashboard-web" / "config" / "dashboard.json"
 
-# =========================
-# SUAS TABLES
-# =========================
+def load_config():
+    with CONFIG_PATH.open("r", encoding="utf-8") as f:
+        return json.load(f)
 
-TABLES_AND_KEYS = {
-    "RobotStress": [
-        "batteryVoltage",
-        "totalCurrent",
-        "drivetrainCurrent",
-        "stressScore",
-        "stressLevel",
-        "speedScale",
-        "chassisSpeed"
-    ],
 
-    "ADL": [
-        "state",
-        "decision",
-        "intent"
-    ],
-
-    "Vision": [
-        "HasTarget",
-        "Aligned",
-        "Confidence"
-    ],
-
-    "Mechanisms": [
-        "ShooterReady",
-        "HasGamePiece",
-        "IntakeActive",
-        "ClimbAvailable"
-    ],
-
-    "Game": [
-        "Endgame"
-    ],
-
-    "Drive": [
-        "Moving"
-    ],
-
-    "Robot": [
-        "BatteryVoltage",
-        "SpeedLimited"
-    ],
-
-    "Shooter": [
-        "CurrentRPM",
-        "TargetRPM"
-    ],
-
-    "StreamDeck/IntakeAngle": [
-        "toggleCount",
-        "calibrateZero",
-        "calibrateTarget"
-    ],
-    "StreamDeck/IntakeRoller": [
-        "intakeToggle",
-        "outtakeToggle"
-    ],
-    "limelight-back": [
-        "piece_tx",
-        "ta",
-        "piece_distance",
-        "has_target",
-        "bbox",
-        "hw"
-    ],
-    "limelight-front": [
-        "tx",
-        "tv",
-        "ta",
-        "hw"
-    ],
-    "limelight-lime2plus": [
-        "hw"
-    ],
-    "Modes": [
-        "AimLockLime4",
-        "AimLockLime2",
-        "AlignLime2",
-        "AimLockLime2Plus",
-        "ShooterLime2Plus",
-        "AlignPiece"
-    ]
-}
+CONFIG = load_config()
+NT_CONFIG = CONFIG["networkTables"]
 
 # =========================
 # NT3 INIT
@@ -122,16 +44,19 @@ def read_value(table, key):
     return val
 
 
-def ensure_entry_exists(table, key):
+def ensure_entry_exists(table, key, spec):
     if key not in table.getKeys():
-        if key in ("bbox", "hw"):
-            table.putNumberArray(key, [0.0, 0.0, 0.0, 0.0])
-        elif key == "has_target":
-            table.putBoolean(key, False)
-        elif key in ("state", "decision", "intent", "stressLevel"):
-            table.putString(key, "")
+        value_type = spec.get("type", "number")
+        default = spec.get("default")
+
+        if value_type == "numberArray":
+            table.putNumberArray(key, default or [])
+        elif value_type == "boolean":
+            table.putBoolean(key, bool(default))
+        elif value_type == "string":
+            table.putString(key, "" if default is None else str(default))
         else:
-            table.putNumber(key, 0.0)
+            table.putNumber(key, float(default or 0.0))
 
 def write_value(table, key, value):
     if isinstance(value, bool):
@@ -163,11 +88,11 @@ async def nt_monitor():
             await asyncio.sleep(2)
             continue
 
-        for table_name, keys in TABLES_AND_KEYS.items():
+        for table_name, keys in NT_CONFIG.items():
             table = get_table(table_name)
 
-            for key in keys:
-                ensure_entry_exists(table, key)
+            for key, spec in keys.items():
+                ensure_entry_exists(table, key, spec)
                 value = read_value(table, key)
 
                 if value is not None:

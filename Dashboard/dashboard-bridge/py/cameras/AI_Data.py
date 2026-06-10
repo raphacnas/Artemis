@@ -4,7 +4,7 @@ import cv2
 import math
 from ultralytics import YOLO
 
-from limelight.RIO2WPILIB import (
+from cameras.RIO2WPILIB import (
     init_nt,
     rio2wpi_tx,
     rio2wpi_ta,

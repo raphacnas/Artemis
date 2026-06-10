@@ -185,3 +185,8 @@ compile_commands.json
 
 # Eclipse generated file for annotation processors
 .factorypath
+
+### Dashboard tooling ###
+__pycache__/
+*.py[cod]
+node_modules/

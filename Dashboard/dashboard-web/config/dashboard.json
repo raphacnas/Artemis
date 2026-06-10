@@ -1,0 +1,138 @@
+{
+  "websocket": {
+    "url": "ws://127.0.0.1:5901/nt/dashboard",
+    "reconnectMs": 1200
+  },
+  "networkTables": {
+    "RobotStress": {
+      "batteryVoltage": { "type": "number", "default": 0 },
+      "totalCurrent": { "type": "number", "default": 0 },
+      "drivetrainCurrent": { "type": "number", "default": 0 },
+      "stressScore": { "type": "number", "default": 0 },
+      "stressLevel": { "type": "string", "default": "" },
+      "speedScale": { "type": "number", "default": 1 },
+      "chassisSpeed": { "type": "number", "default": 0 }
+    },
+    "ADL": {
+      "state": { "type": "string", "default": "IDLE" },
+      "decision": { "type": "string", "default": "" },
+      "intent": { "type": "string", "default": "" }
+    },
+    "Vision": {
+      "HasTarget": { "type": "boolean", "default": false },
+      "Aligned": { "type": "boolean", "default": false },
+      "Confidence": { "type": "number", "default": 0 }
+    },
+    "Mechanisms": {
+      "ShooterReady": { "type": "boolean", "default": false },
+      "HasGamePiece": { "type": "boolean", "default": false },
+      "IntakeActive": { "type": "boolean", "default": false },
+      "ClimbAvailable": { "type": "boolean", "default": false }
+    },
+    "Game": {
+      "Endgame": { "type": "boolean", "default": false }
+    },
+    "Drive": {
+      "Moving": { "type": "boolean", "default": false }
+    },
+    "Robot": {
+      "BatteryVoltage": { "type": "number", "default": 12 },
+      "SpeedLimited": { "type": "boolean", "default": false },
+      "CurrentZone": { "type": "string", "default": "UNKNOWN" }
+    },
+    "Shooter": {
+      "CurrentRPM": { "type": "number", "default": 0 },
+      "TargetRPM": { "type": "number", "default": 0 }
+    },
+    "StreamDeck/IntakeAngle": {
+      "toggleCount": { "type": "boolean", "default": false },
+      "calibrateZero": { "type": "boolean", "default": false },
+      "calibrateTarget": { "type": "boolean", "default": false }
+    },
+    "StreamDeck/IntakeRoller": {
+      "intakeToggle": { "type": "boolean", "default": false },
+      "outtakeToggle": { "type": "boolean", "default": false }
+    },
+    "limelight-back": {
+      "piece_tx": { "type": "number", "default": 0 },
+      "ta": { "type": "number", "default": 0 },
+      "piece_distance": { "type": "number", "default": 0 },
+      "has_target": { "type": "boolean", "default": false },
+      "bbox": { "type": "numberArray", "default": [0, 0, 0, 0] },
+      "hw": { "type": "numberArray", "default": [0, 0, 0, 0] }
+    },
+    "limelight-front": {
+      "tx": { "type": "number", "default": 0 },
+      "tv": { "type": "number", "default": 0 },
+      "ta": { "type": "number", "default": 0 },
+      "hw": { "type": "numberArray", "default": [0, 0, 0, 0] }
+    },
+    "limelight-lime2plus": {
+      "hw": { "type": "numberArray", "default": [0, 0, 0, 0] }
+    },
+    "Modes": {
+      "AimLockLime4": { "type": "number", "default": 0 },
+      "AimLockLime2": { "type": "number", "default": 0 },
+      "AlignLime2": { "type": "number", "default": 0 },
+      "AimLockLime2Plus": { "type": "number", "default": 0 },
+      "ShooterLime2Plus": { "type": "number", "default": 0 },
+      "AlignPiece": { "type": "number", "default": 0 }
+    }
+  },
+  "topics": {
+    "adlState": "/ADL/state",
+    "adlDecision": "/ADL/decision",
+    "adlIntent": "/ADL/intent",
+    "visionHasTarget": "/Vision/HasTarget",
+    "visionAligned": "/Vision/Aligned",
+    "shooterReady": "/Mechanisms/ShooterReady",
+    "hasGamePiece": "/Mechanisms/HasGamePiece",
+    "endgame": "/Game/Endgame",
+    "driveMoving": "/Drive/Moving",
+    "robotBattery": "/Robot/BatteryVoltage",
+    "shooterCurrentRpm": "/Shooter/CurrentRPM",
+    "shooterTargetRpm": "/Shooter/TargetRPM",
+    "stressBatteryVoltage": "/RobotStress/batteryVoltage",
+    "stressTotalCurrent": "/RobotStress/totalCurrent",
+    "stressDrivetrainCurrent": "/RobotStress/drivetrainCurrent",
+    "stressScore": "/RobotStress/stressScore",
+    "stressLevel": "/RobotStress/stressLevel",
+    "stressSpeedScale": "/RobotStress/speedScale",
+    "stressChassisSpeed": "/RobotStress/chassisSpeed"
+  },
+  "adl": {
+    "maxLogEntries": 60,
+    "states": {
+      "IDLE": { "icon": "o", "description": "Aguardando intencao" },
+      "MOVING": { "icon": ">", "description": "Robo em movimento" },
+      "ACQUIRING": { "icon": "v", "description": "Coletando game piece" },
+      "SCORING": { "icon": "*", "description": "Executando pontuacao" },
+      "CLIMBING": { "icon": "^", "description": "Iniciando escalada" },
+      "BLOCKED": { "icon": "x", "description": "Estado bloqueado" },
+      "EMERGENCY": { "icon": "!", "description": "ABORTAR - EMERGENCIA" }
+    },
+    "intents": {
+      "acquirePiece": "ACQUIRE_PIECE",
+      "score": "SCORE",
+      "moveDepot": "MOVE_DEPOT",
+      "climb": "CLIMB",
+      "holdPosition": "HOLD_POSITION",
+      "abort": "ABORT"
+    }
+  },
+  "stress": {
+    "metrics": [
+      { "topic": "stressBatteryVoltage", "elementId": "battery-voltage", "suffix": " V", "decimals": 2 },
+      { "topic": "stressTotalCurrent", "elementId": "total-current", "suffix": " A", "decimals": 1 },
+      { "topic": "stressDrivetrainCurrent", "elementId": "drivetrain-current", "suffix": " A", "decimals": 1 },
+      { "topic": "stressScore", "elementId": "stress-score", "suffix": "", "decimals": 0 }
+    ],
+    "levels": {
+      "LOW": "status-ok",
+      "MEDIUM": "status-medium",
+      "HIGH": "status-high",
+      "CRITICAL": "status-critical"
+    },
+    "batteryWarningVoltage": 11.0
+  }
+}

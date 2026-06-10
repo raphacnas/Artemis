@@ -2,12 +2,12 @@ import threading
 import time
 import asyncio
 
-import limelight.AI_Data
+import cameras.AI_Data
 import bridge.nt3_ws
 
 def run_limelight():
     try:
-        limelight.AI_Data.main_loop()
+        cameras.AI_Data.main_loop()
     except Exception as e:
         print(f"❌ Limelight erro: {e}")
 

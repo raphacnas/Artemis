@@ -1,105 +1,112 @@
 "use strict";
 
-import { onNTMessage, ntSend, onConnectionChange } from "../ws.js";
+import { loadDashboardConfig, splitTopic, topic } from "../config.js";
+import { onConnectionChange, onNTMessage, ntSend } from "../ws.js";
+
+const config = await loadDashboardConfig();
+const stateMeta = config.adl?.states || {};
+const maxLog = config.adl?.maxLogEntries || 60;
 
 const T = {
-  STATE:    "/ADL/state",
-  DECISION: "/ADL/decision",
-  VISION:   "/Vision/HasTarget",
-  ALIGNED:  "/Vision/Aligned",
-  SHOOTER:  "/Mechanisms/ShooterReady",
-  PIECE:    "/Mechanisms/HasGamePiece",
-  ENDGAME:  "/Game/Endgame",
-  MOVING:   "/Drive/Moving",
-  BATTERY:  "/Robot/BatteryVoltage",
-  RPM_CUR:  "/Shooter/CurrentRPM",
-  RPM_TGT:  "/Shooter/TargetRPM",
-};
-
-const STATE_META = {
-  IDLE:      { icon: "○", desc: "Aguardando intenção" },
-  MOVING:    { icon: "⟶", desc: "Robô em movimento" },
-  ACQUIRING: { icon: "⬇", desc: "Coletando game piece" },
-  SCORING:   { icon: "◎", desc: "Executando pontuação" },
-  CLIMBING:  { icon: "↑", desc: "Iniciando escalada" },
-  BLOCKED:   { icon: "✕", desc: "Estado bloqueado" },
-  EMERGENCY: { icon: "⚠", desc: "ABORTAR — EMERGÊNCIA" },
+  state: topic(config, "adlState"),
+  decision: topic(config, "adlDecision"),
+  vision: topic(config, "visionHasTarget"),
+  aligned: topic(config, "visionAligned"),
+  shooter: topic(config, "shooterReady"),
+  piece: topic(config, "hasGamePiece"),
+  endgame: topic(config, "endgame"),
+  moving: topic(config, "driveMoving"),
+  battery: topic(config, "robotBattery"),
+  rpmCur: topic(config, "shooterCurrentRpm"),
+  rpmTgt: topic(config, "shooterTargetRpm"),
+  intent: topic(config, "adlIntent")
 };
 
 const el = {
-  connDot:        document.getElementById("conn-dot"),
-  connLabel:      document.getElementById("conn-label"),
-  stateBadge:     document.getElementById("state-badge"),
-  stateIcon:      document.getElementById("state-icon"),
-  stateDesc:      document.getElementById("state-desc"),
-  endgameBanner:  document.getElementById("endgame-banner"),
-  dtypeBadge:     document.getElementById("dtype-badge"),
+  connDot: document.getElementById("conn-dot"),
+  connLabel: document.getElementById("conn-label"),
+  stateBadge: document.getElementById("state-badge"),
+  stateIcon: document.getElementById("state-icon"),
+  stateDesc: document.getElementById("state-desc"),
+  endgameBanner: document.getElementById("endgame-banner"),
+  dtypeBadge: document.getElementById("dtype-badge"),
   decisionReason: document.getElementById("decision-reason"),
-  ctxVision:      document.getElementById("ctx-vision"),
-  ctxAligned:     document.getElementById("ctx-aligned"),
-  ctxShooter:     document.getElementById("ctx-shooter"),
-  ctxPiece:       document.getElementById("ctx-piece"),
-  ctxEndgame:     document.getElementById("ctx-endgame"),
-  ctxMoving:      document.getElementById("ctx-moving"),
-  ctxBattery:     document.getElementById("ctx-battery"),
-  ctxRpm:         document.getElementById("ctx-rpm"),
-  logList:        document.getElementById("log-list"),
+  ctxVision: document.getElementById("ctx-vision"),
+  ctxAligned: document.getElementById("ctx-aligned"),
+  ctxShooter: document.getElementById("ctx-shooter"),
+  ctxPiece: document.getElementById("ctx-piece"),
+  ctxEndgame: document.getElementById("ctx-endgame"),
+  ctxMoving: document.getElementById("ctx-moving"),
+  ctxBattery: document.getElementById("ctx-battery"),
+  ctxRpm: document.getElementById("ctx-rpm"),
+  logList: document.getElementById("log-list")
 };
 
 let matchActive = false;
-let _rpmCur = 0, _rpmTgt = 0;
-const MAX_LOG = 60;
+let lastState = "";
+let _rpmCur = 0;
+let _rpmTgt = 0;
 
 onConnectionChange((online) => {
   if (!el.connDot || !el.connLabel) return;
-  if (online) {
-    el.connDot.classList.add("live");
-    el.connLabel.textContent = "ONLINE";
-    addLog("WebSocket conectado", "ok");
-  } else {
-    el.connDot.classList.remove("live");
-    el.connLabel.textContent = "OFFLINE";
-    addLog("Conexão perdida — reconectando...", "danger");
-  }
+
+  el.connDot.classList.toggle("live", online);
+  el.connLabel.textContent = online ? "ONLINE" : "OFFLINE";
+  addLog(online ? "WebSocket conectado" : "Conexao perdida - reconectando...", online ? "ok" : "danger");
 });
 
-onNTMessage((topic, value) => {
-  switch (topic) {
-    case T.STATE:    setState(String(value));    break;
-    case T.DECISION: setDecision(String(value)); break;
-    case T.VISION:   setPill(el.ctxVision,  Boolean(value)); break;
-    case T.ALIGNED:  setPill(el.ctxAligned, Boolean(value)); break;
-    case T.SHOOTER:  setPill(el.ctxShooter, Boolean(value)); break;
-    case T.PIECE:    setPill(el.ctxPiece,   Boolean(value)); break;
-    case T.MOVING:   setPill(el.ctxMoving,  Boolean(value)); break;
-
-    case T.ENDGAME: {
-      const eg = Boolean(value);
-      setPill(el.ctxEndgame, eg, true);
-      if (el.endgameBanner) el.endgameBanner.classList.toggle("hidden", !eg);
-      setMatchActive(eg);
+onNTMessage((topicName, value) => {
+  switch (topicName) {
+    case T.state:
+      setState(String(value));
       break;
-    }
-
-    case T.BATTERY: {
-      const v = Number(value);
-      if (el.ctxBattery) {
-        el.ctxBattery.textContent = v.toFixed(2) + " V";
-        el.ctxBattery.style.color =
-          v < 10 ? "var(--danger)" : v < 11 ? "var(--warn)" : "var(--accent)";
-      }
+    case T.decision:
+      setDecision(String(value));
       break;
-    }
-
-    case T.RPM_CUR:
+    case T.vision:
+      setPill(el.ctxVision, Boolean(value));
+      break;
+    case T.aligned:
+      setPill(el.ctxAligned, Boolean(value));
+      break;
+    case T.shooter:
+      setPill(el.ctxShooter, Boolean(value));
+      break;
+    case T.piece:
+      setPill(el.ctxPiece, Boolean(value));
+      break;
+    case T.moving:
+      setPill(el.ctxMoving, Boolean(value));
+      break;
+    case T.endgame:
+      setEndgame(Boolean(value));
+      break;
+    case T.battery:
+      setBattery(Number(value));
+      break;
+    case T.rpmCur:
       _rpmCur = Number(value);
-      updateRpm(); break;
-
-    case T.RPM_TGT:
+      updateRpm();
+      break;
+    case T.rpmTgt:
       _rpmTgt = Number(value);
-      updateRpm(); break;
+      updateRpm();
+      break;
   }
 });
+
+function setEndgame(active) {
+  setPill(el.ctxEndgame, active, true);
+  if (el.endgameBanner) el.endgameBanner.classList.toggle("hidden", !active);
+  setMatchActive(active);
+}
+
+function setBattery(voltage) {
+  if (!el.ctxBattery || !Number.isFinite(voltage)) return;
+  el.ctxBattery.textContent = voltage.toFixed(2) + " V";
+  el.ctxBattery.style.color =
+    voltage < 10 ? "var(--danger)" : voltage < 11 ? "var(--warn)" : "var(--accent)";
+}
 
 function updateRpm() {
   if (!el.ctxRpm) return;
@@ -110,64 +117,84 @@ function updateRpm() {
 
 function setMatchActive(active) {
   matchActive = active;
-  document.querySelectorAll(".ibtn").forEach(btn => {
-    btn.disabled      = active;
+  document.querySelectorAll(".ibtn").forEach((btn) => {
+    btn.disabled = active;
     btn.style.opacity = active ? "0.3" : "1";
-    btn.style.cursor  = active ? "not-allowed" : "pointer";
+    btn.style.cursor = active ? "not-allowed" : "pointer";
   });
 }
 
 function addLog(msg, type = "") {
   if (!el.logList) return;
-  const ts  = new Date().toTimeString().slice(0, 8);
+
+  const ts = new Date().toTimeString().slice(0, 8);
   const div = document.createElement("div");
   div.className = "log-entry";
   div.innerHTML = `<span class="log-ts">${ts}</span><span class="log-msg ${type}">${msg}</span>`;
   el.logList.prepend(div);
-  while (el.logList.children.length > MAX_LOG) el.logList.lastChild.remove();
+
+  while (el.logList.children.length > maxLog) el.logList.lastChild.remove();
 }
 
-function clearLog() { if (el.logList) el.logList.innerHTML = ""; }
+function clearLog() {
+  if (el.logList) el.logList.innerHTML = "";
+}
 window.clearLog = clearLog;
 
 function setPill(elem, on, warnMode = false) {
   if (!elem) return;
   elem.textContent = on ? "ON" : "OFF";
-  elem.className   = "ctx-pill" + (on ? (warnMode ? " warn" : " on") : "");
+  elem.className = "ctx-pill" + (on ? (warnMode ? " warn" : " on") : "");
 }
 
-let lastState = "";
 function setState(state) {
   if (state === lastState) return;
   lastState = state;
-  const meta = STATE_META[state] || { icon: "?", desc: state };
+
+  const meta = stateMeta[state] || { icon: "?", description: state };
   el.stateBadge.textContent = state;
-  el.stateBadge.className   = "state-badge " + state;
-  el.stateIcon.textContent  = meta.icon;
-  el.stateIcon.className    = "state-icon " + state;
-  el.stateDesc.textContent  = meta.desc;
+  el.stateBadge.className = "state-badge " + state;
+  el.stateIcon.textContent = meta.icon;
+  el.stateIcon.className = "state-icon " + state;
+  el.stateDesc.textContent = meta.description;
+
   const logType =
     state === "EMERGENCY" ? "danger" :
-    state === "BLOCKED"   ? "warn"   :
-    state === "IDLE"      ? ""       : "ok";
-  addLog("Estado → " + state, logType);
+    state === "BLOCKED" ? "warn" :
+    state === "IDLE" ? "" : "ok";
+  addLog("Estado -> " + state, logType);
 }
 
 function setDecision(raw) {
-  let dtype = "EXECUTE", reason = raw;
-  if (raw.startsWith("HOLD: "))   { dtype = "HOLD";   reason = raw.slice(6); }
-  if (raw.startsWith("REJECT: ")) { dtype = "REJECT"; reason = raw.slice(8); }
-  el.dtypeBadge.textContent     = dtype;
-  el.dtypeBadge.className       = "dtype-badge " + dtype;
+  let dtype = "EXECUTE";
+  let reason = raw;
+
+  if (raw.startsWith("HOLD: ")) {
+    dtype = "HOLD";
+    reason = raw.slice(6);
+  }
+  if (raw.startsWith("REJECT: ")) {
+    dtype = "REJECT";
+    reason = raw.slice(8);
+  }
+
+  el.dtypeBadge.textContent = dtype;
+  el.dtypeBadge.className = "dtype-badge " + dtype;
   el.decisionReason.textContent = reason;
+
   const logType = dtype === "REJECT" ? "danger" : dtype === "HOLD" ? "warn" : "";
   addLog(dtype + ": " + reason, logType);
 }
 
 function sendIntent(cmd) {
-  if (matchActive) { addLog("⚠ Partida ativa — use o controle físico", "warn"); return; }
-  ntSend({ action: "put", table: "ADL", key: "intent", value: cmd });
-  addLog("→ " + cmd, "info");
+  if (matchActive) {
+    addLog("Partida ativa - use o controle fisico", "warn");
+    return;
+  }
+
+  const target = splitTopic(T.intent);
+  ntSend({ action: "put", table: target.table, key: target.key, value: cmd });
+  addLog("-> " + cmd, "info");
 }
 window.sendIntent = sendIntent;
 
