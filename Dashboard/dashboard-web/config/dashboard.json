@@ -134,5 +134,10 @@
       "CRITICAL": "status-critical"
     },
     "batteryWarningVoltage": 11.0
+  },
+  "cameras": {
+    "lime4": "http://10.91.63.30:5800/stream.mjpg",
+    "lime2plus": "http://10.91.63.20:5800",
+    "fisheye": "http://10.91.63.2:1181/?action=stream"
   }
 }
