@@ -5,10 +5,14 @@ import java.util.function.DoubleSupplier;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -74,6 +78,9 @@ public class RobotContainer {
 
   private final ADLManager adlManager;
 
+  private AddressableLED m_led;
+  private AddressableLEDBuffer m_ledBuffer;
+
   public RobotContainer() {
 
     controller = new CommandPS5Controller(Constants.PS5_ID);
@@ -128,6 +135,8 @@ public class RobotContainer {
         spindexerManager
     )
 );
+
+    Leds();
   }
 
   private void configureBindings() {
@@ -238,5 +247,22 @@ public class RobotContainer {
 
   public void setMotorBrake(boolean brake) {
     drivebase.setMotorBrake(brake);
+  }
+  
+    public void Leds(){
+      m_led = new AddressableLED(0);
+
+     m_ledBuffer = new AddressableLEDBuffer(720);
+     m_led.setLength(m_ledBuffer.getLength());
+
+     
+
+     LEDPattern red = LEDPattern.solid(Color.kGreen);
+
+     red.applyTo(m_ledBuffer);
+     m_led.setData(m_ledBuffer);
+
+     m_led.setData(m_ledBuffer);
+     m_led.start();
   }
 }

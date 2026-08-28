@@ -43,9 +43,6 @@ private final SparkMaxConfig cfg2;
         PersistMode.kPersistParameters);
 
    climb_left.configure(cfg1, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-
-
   }
 
 
